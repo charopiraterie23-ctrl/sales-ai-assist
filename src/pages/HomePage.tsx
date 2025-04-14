@@ -132,7 +132,7 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <PricingCard
               title="Free"
-              price="0€"
+              price="0$"
               description="Pour tester l'expérience"
               features={[
                 "Jusqu'à 3 appels/mois",
@@ -145,7 +145,7 @@ const HomePage = () => {
             />
             <PricingCard
               title="Pro"
-              price="19€"
+              price="19$"
               badge="Le plus populaire"
               description="Pour les professionnels"
               features={[
@@ -161,7 +161,7 @@ const HomePage = () => {
             />
             <PricingCard
               title="Équipe"
-              price="199€"
+              price="199$"
               description="Pour les équipes"
               features={[
                 "Jusqu'à 10 membres",
