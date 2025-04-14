@@ -23,7 +23,6 @@ interface Call {
   id: string;
   client_id: string;
   created_at: string;
-  client_name?: string;
 }
 
 interface CallsToFollow {
@@ -67,7 +66,7 @@ export const useDashboardData = (userId: string | undefined) => {
             .from('followup_emails')
             .select(`
               id, to_email, subject, body, summary_id,
-              summaries!inner(id, calls!inner(user_id))
+              summaries!inner(call_id, calls!inner(user_id))
             `)
             .eq('status', 'à envoyer')
             .eq('summaries.calls.user_id', userId);
@@ -93,7 +92,6 @@ export const useDashboardData = (userId: string | undefined) => {
             .from('calls')
             .select(`
               id, client_id, created_at,
-              clients(full_name),
               summaries(id, followup_emails(status))
             `)
             .eq('user_id', userId)
@@ -116,8 +114,7 @@ export const useDashboardData = (userId: string | undefined) => {
           }).map(call => ({
             id: call.id,
             client_id: call.client_id,
-            created_at: call.created_at,
-            client_name: call.clients?.full_name
+            created_at: call.created_at
           })) : [];
           
           setCallsToFollow({ calls: callsToFollowUp });

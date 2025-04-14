@@ -67,7 +67,6 @@ const DashboardPage = () => {
           userPlan={userPlan}
           connectEmail={connectEmail}
           emailSynced={profile?.email_synced}
-          userEmail={user?.email}
         />
 
         {/* Afficher le contenu selon le plan */}
@@ -78,8 +77,6 @@ const DashboardPage = () => {
             callsUsed={callsUsed}
             callsTotal={callsLimit}
             usagePercentage={usagePercentage}
-            dashboardData={dashboardData}
-            isEmailConnected={!!profile?.email_synced}
           />
         ) : (
           <FreeDashboardContent 
@@ -90,7 +87,6 @@ const DashboardPage = () => {
             callsUsed={callsUsed}
             callsTotal={callsLimit}
             usagePercentage={usagePercentage}
-            dashboardData={dashboardData}
           />
         )}
       </div>

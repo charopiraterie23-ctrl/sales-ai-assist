@@ -2,36 +2,10 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
-import CallSummaryCard from '../CallSummaryCard';
+import { Badge } from '@/components/ui/badge';
+import { ChevronRight, Tag } from 'lucide-react';
 
 const RecentAISummariesCard = () => {
-  // Données pour les résumés d'appel
-  const summaries = [
-    {
-      clientName: "Appel avec Sophie Martin",
-      date: "Aujourd'hui",
-      duration: "26 min",
-      summary: "Discussion sur l'implémentation du CRM. La cliente souhaite former son équipe avant la fin du mois et a besoin de notre documentation.",
-      summaryId: "456",
-      tags: [
-        { text: "formation", color: "bg-blue-50 text-blue-600 border-blue-200" },
-        { text: "documentation", color: "bg-purple-50 text-purple-600 border-purple-200" }
-      ]
-    },
-    {
-      clientName: "Appel avec Marc Dubois",
-      date: "Hier",
-      duration: "18 min",
-      summary: "Négociation du renouvellement de contrat. Le client hésite entre notre offre Pro et Premium. Point d'attention sur le budget limité ce trimestre.",
-      summaryId: "789",
-      tags: [
-        { text: "budget", color: "bg-orange-50 text-orange-600 border-orange-200" },
-        { text: "renouvellement", color: "bg-green-50 text-green-600 border-green-200" }
-      ]
-    }
-  ];
-
   return (
     <Card className="animate-slide-up">
       <CardHeader className="pb-2">
@@ -45,25 +19,51 @@ const RecentAISummariesCard = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {summaries.map((summary, index) => (
-          <div key={index} className="border rounded-lg p-4">
-            <CallSummaryCard
-              title=""
-              clientName={summary.clientName}
-              date={summary.date}
-              duration={summary.duration}
-              summary={summary.summary}
-              summaryId={summary.summaryId}
-              tags={summary.tags}
-              showHeader={false}
-              showFooter={false}
-            />
-            <div className="flex gap-2 mt-3">
-              <Button variant="outline" size="sm" className="text-xs">Voir résumé</Button>
-              <Button variant="outline" size="sm" className="text-xs">Copier dans email</Button>
-            </div>
+        {/* First summary card */}
+        <div className="border rounded-lg p-4">
+          <div className="flex justify-between mb-1">
+            <span className="font-medium">Appel avec Sophie Martin</span>
+            <span className="text-sm text-gray-500">26 min • Aujourd'hui</span>
           </div>
-        ))}
+          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-2">
+            Discussion sur l'implémentation du CRM. La cliente souhaite former son équipe avant la fin du mois et a besoin de notre documentation.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
+              <Tag className="h-3 w-3 mr-1" /> #formation
+            </Badge>
+            <Badge variant="outline" className="bg-purple-50 text-purple-600 border-purple-200">
+              <Tag className="h-3 w-3 mr-1" /> #documentation
+            </Badge>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="text-xs">Voir résumé</Button>
+            <Button variant="outline" size="sm" className="text-xs">Copier dans email</Button>
+          </div>
+        </div>
+        
+        {/* Second summary card */}
+        <div className="border rounded-lg p-4">
+          <div className="flex justify-between mb-1">
+            <span className="font-medium">Appel avec Marc Dubois</span>
+            <span className="text-sm text-gray-500">18 min • Hier</span>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-2 mb-2">
+            Négociation du renouvellement de contrat. Le client hésite entre notre offre Pro et Premium. Point d'attention sur le budget limité ce trimestre.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Badge variant="outline" className="bg-orange-50 text-orange-600 border-orange-200">
+              <Tag className="h-3 w-3 mr-1" /> #budget
+            </Badge>
+            <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+              <Tag className="h-3 w-3 mr-1" /> #renouvellement
+            </Badge>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="text-xs">Voir résumé</Button>
+            <Button variant="outline" size="sm" className="text-xs">Copier dans email</Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

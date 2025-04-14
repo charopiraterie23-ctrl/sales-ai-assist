@@ -7,7 +7,6 @@ import RecentClientsCard from './free/RecentClientsCard';
 import UsageCard from './free/UsageCard';
 import TipCard from './TipCard';
 import QuickLinksGrid from './free/QuickLinksGrid';
-import { DashboardData } from '@/hooks/useDashboardData';
 
 interface FreeDashboardContentProps {
   isFirstLogin: boolean;
@@ -17,7 +16,6 @@ interface FreeDashboardContentProps {
   callsUsed: number;
   callsTotal: number;
   usagePercentage: number;
-  dashboardData?: DashboardData;
 }
 
 const tips = [
@@ -34,12 +32,8 @@ const FreeDashboardContent = ({
   tipIndex, 
   callsUsed, 
   callsTotal, 
-  usagePercentage,
-  dashboardData
+  usagePercentage 
 }: FreeDashboardContentProps) => {
-  // Determine if we have a recent call based on dashboard data
-  const hasCall = hasRecentCall || (dashboardData?.callsToFollow?.calls.length || 0) > 0;
-  
   return (
     <>
       {/* First Login Welcome Card */}
@@ -49,7 +43,7 @@ const FreeDashboardContent = ({
       <NewCallCard />
 
       {/* Last Call Summary (if exists) */}
-      <RecentCallCard hasRecentCall={hasCall} />
+      <RecentCallCard hasRecentCall={hasRecentCall} />
 
       {/* Client Snapshot */}
       <RecentClientsCard />
