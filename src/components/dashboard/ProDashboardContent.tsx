@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import TodayOverviewCard from './pro/TodayOverviewCard';
 import NewCallCard from './free/NewCallCard';
@@ -7,6 +8,7 @@ import StatisticsCard from './pro/StatisticsCard';
 import ActiveClientsCard from './pro/ActiveClientsCard';
 import TipCard from './TipCard';
 import ProShortcutGrid from './pro/ProShortcutGrid';
+import { EmailsToSend, DashboardData } from '@/types/dashboardTypes';
 
 interface ProDashboardContentProps {
   navigate: ReturnType<typeof useNavigate>;
@@ -14,6 +16,9 @@ interface ProDashboardContentProps {
   callsUsed: number;
   callsTotal: number;
   usagePercentage: number;
+  dashboardData: DashboardData;
+  isEmailConnected: boolean;
+  onConnectEmail: () => void;
 }
 
 const tips = [
@@ -28,13 +33,15 @@ const ProDashboardContent = ({
   tipIndex, 
   callsUsed, 
   callsTotal, 
-  usagePercentage 
+  usagePercentage,
+  dashboardData,
+  isEmailConnected,
+  onConnectEmail
 }: ProDashboardContentProps) => {
   // Sample data for Pro dashboard
-  const pendingCallsToday = 3;
-  const readyEmails = 2;
-  const clientsToFollowUp = 4;
-  const isEmailConnected = false;
+  const pendingCallsToday = dashboardData.callsToFollow?.calls.length || 0;
+  const readyEmails = dashboardData.emailsToSend?.emails.length || 0;
+  const clientsToFollowUp = 0; // À compléter plus tard
 
   return (
     <>
@@ -52,7 +59,13 @@ const ProDashboardContent = ({
       <RecentAISummariesCard />
 
       {/* Ready-to-Send Emails */}
-      <ReadyEmailsCard isEmailConnected={isEmailConnected} />
+      <ReadyEmailsCard 
+        isEmailConnected={isEmailConnected}
+        isLoading={dashboardData.isLoadingEmails}
+        emails={dashboardData.emailsToSend?.emails}
+        onConnectEmail={onConnectEmail}
+        onRefresh={dashboardData.refetch}
+      />
 
       {/* Personal Statistics */}
       <StatisticsCard 

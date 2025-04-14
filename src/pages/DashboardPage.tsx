@@ -44,6 +44,10 @@ const DashboardPage = () => {
   const callsUsed = dashboardData.callsThisMonth?.total_calls || 0;
   const usagePercentage = (callsUsed / callsLimit) * 100;
 
+  const handleConnectEmail = () => {
+    connectEmail('gmail'); // Par défaut, on propose Gmail
+  };
+
   if (isLoading || dashboardData.isLoadingData) {
     return (
       <Layout title="Dashboard" showNavbar={true}>
@@ -77,6 +81,9 @@ const DashboardPage = () => {
             callsUsed={callsUsed}
             callsTotal={callsLimit}
             usagePercentage={usagePercentage}
+            dashboardData={dashboardData}
+            isEmailConnected={profile?.email_synced || false}
+            onConnectEmail={handleConnectEmail}
           />
         ) : (
           <FreeDashboardContent 
