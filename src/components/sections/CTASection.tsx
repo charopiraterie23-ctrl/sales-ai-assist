@@ -13,7 +13,7 @@ const CTASection = () => {
           className="rounded-full px-8 py-6 text-base bg-gradient-to-r from-blue-600 to-indigo-500 hover:shadow-lg transition-all"
           asChild
         >
-          <Link to="/register">Créer un compte gratuit</Link>
+          <Link to="/login">Créer un compte gratuit</Link>
         </Button>
       </div>
     </section>
