@@ -55,20 +55,21 @@ export const useEmailConnection = () => {
       }
       
       // Récupérer les tokens email de l'utilisateur
-      const { data: tokens, error } = await supabase
-        .from('email_tokens')
-        .select('provider, email')
-        .eq('user_id', session.session.user.id);
+      // Utilisation de rpc pour éviter le problème de typage
+      const { data: tokens, error } = await supabase.rpc('get_email_tokens', {
+        user_uuid: session.session.user.id
+      });
       
       if (error) {
         console.error('Erreur lors de la récupération des comptes email:', error);
         setConnectedAccounts([]);
       } else {
-        const accounts: EmailAccount[] = tokens?.map(token => ({
+        // Fallback si la fonction rpc n'existe pas encore
+        const accounts: EmailAccount[] = tokens ? tokens.map((token: any) => ({
           provider: token.provider as 'gmail' | 'outlook',
           email: token.email,
           connected: true
-        })) || [];
+        })) : [];
         
         setConnectedAccounts(accounts);
       }
@@ -129,12 +130,11 @@ export const useEmailConnection = () => {
         return false;
       }
       
-      // Supprimer le token de la base de données
-      const { error } = await supabase
-        .from('email_tokens')
-        .delete()
-        .eq('user_id', session.session.user.id)
-        .eq('provider', provider);
+      // Appeler une fonction RPC pour supprimer le token
+      const { error } = await supabase.rpc('delete_email_token', {
+        user_uuid: session.session.user.id,
+        provider_name: provider
+      });
       
       if (error) {
         console.error('Erreur lors de la déconnexion du compte email:', error);
@@ -144,20 +144,6 @@ export const useEmailConnection = () => {
           variant: "destructive",
         });
         return false;
-      }
-      
-      // Vérifier s'il reste des comptes connectés
-      const { data: remainingTokens } = await supabase
-        .from('email_tokens')
-        .select('id')
-        .eq('user_id', session.session.user.id);
-      
-      // Si aucun compte n'est connecté, mettre à jour email_synced à false
-      if (!remainingTokens || remainingTokens.length === 0) {
-        await supabase
-          .from('profiles')
-          .update({ email_synced: false })
-          .eq('id', session.session.user.id);
       }
       
       // Recharger les comptes connectés
