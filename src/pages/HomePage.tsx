@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,7 +11,7 @@ const HomePage = () => {
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-400 bg-clip-text text-transparent">
-            nexentry.io
+            nexentry
           </Link>
           
           <div className="hidden md:flex items-center space-x-6">
@@ -42,7 +41,7 @@ const HomePage = () => {
             Repenser la façon dont vous <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">vendez.</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            nexentry.io résume vos appels, génère vos relances, et optimise votre temps.
+            nexentry résume vos appels, génère vos relances, et optimise votre temps.
           </p>
           
           <div className="max-w-md mx-auto flex flex-col sm:flex-row gap-3 mb-4">
@@ -195,7 +194,7 @@ const HomePage = () => {
       <footer className="bg-gray-900 text-gray-400 py-12 px-4">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-white font-semibold mb-4">nexentry.io</h3>
+            <h3 className="text-white font-semibold mb-4">nexentry</h3>
             <p className="text-sm">Simplifiez vos ventes grâce à l'IA.</p>
           </div>
           <div>
@@ -223,7 +222,7 @@ const HomePage = () => {
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-gray-800 text-sm text-center">
-          &copy; {new Date().getFullYear()} nexentry.io. Tous droits réservés.
+          &copy; {new Date().getFullYear()} nexentry. Tous droits réservés.
         </div>
       </footer>
     </div>
