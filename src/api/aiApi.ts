@@ -71,7 +71,6 @@ export const analyzeCallTranscript = async (
     }
     
     console.log('Analyse reçue avec succès:', data);
-    console.log('Analyse terminée avec succès', data);
     
     // Stocker les données d'analyse complètes dans localStorage (avec les métadonnées)
     const completeAnalysis = {

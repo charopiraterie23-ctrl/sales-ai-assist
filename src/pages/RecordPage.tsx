@@ -20,7 +20,7 @@ const RecordPage = () => {
   const [retries, setRetries] = useState(0);
   const [isShortenedTranscript, setShortenedTranscript] = useState(false);
 
-  // Utiliser une transcription plus courte pour réduire les risques d'erreur
+  // Utiliser une transcription réaliste pour les tests
   const transcriptionRef = useRef("Bonjour Jean, merci de prendre le temps de discuter aujourd'hui. " +
     "Je voulais faire un suivi concernant notre dernière conversation sur l'implémentation du CRM. " +
     "Est-ce que votre équipe a eu le temps de consulter la documentation que je vous ai envoyée ? " +
@@ -57,6 +57,10 @@ const RecordPage = () => {
   const sendAnalysisRequest = async (text: string, name: string, time: number, additionalContext?: string) => {
     try {
       console.log(`Envoi d'une demande d'analyse - Longueur transcription: ${text.length} caractères`);
+      console.log(`Analyse pour client: ${name}, durée: ${time}s, contexte: ${additionalContext || 'aucun'}`);
+      
+      // Supprimer les données précédentes pour éviter de les mélanger
+      localStorage.removeItem('callAnalysis');
       
       const result = await analyzeCallTranscript(
         text,
@@ -66,13 +70,6 @@ const RecordPage = () => {
       );
       
       console.log('Analyse terminée avec succès', result);
-      
-      localStorage.setItem('callAnalysis', JSON.stringify({
-        ...result,
-        clientName: name,
-        duration: time,
-        date: new Date().toISOString()
-      }));
       
       navigate('/call-summary/new');
     } catch (error) {
@@ -121,14 +118,14 @@ const RecordPage = () => {
       setError(null);
       setShortenedTranscript(false);
       
-      // Utiliser une transcription encore plus courte pour le test d'upload
+      // Simuler une transcription pour le test d'upload
       const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
         "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
         "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
         "Je comprends que le budget est une préoccupation ce trimestre.";
           
       const uploadClientName = "Marc Dubois";
-      const mockDuration = 120; // Durée plus courte de 2 minutes
+      const mockDuration = 120; // 2 minutes
       const uploadContext = "Renouvellement de contrat";
       
       await sendAnalysisRequest(mockTranscript, uploadClientName, mockDuration, uploadContext);
@@ -140,7 +137,7 @@ const RecordPage = () => {
     setError(null);
     setIsProcessing(true);
     
-    // Réduire drastiquement la taille de la transcription pour le test
+    // Réduire la taille de la transcription pour le test
     const shortTranscript = "Bonjour Jean. Merci pour notre conversation sur le CRM. " + 
       "La formation est prévue jeudi prochain. Je vous envoie un récapitulatif par email.";
     

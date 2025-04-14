@@ -32,7 +32,7 @@ const CallSummaryPage = () => {
     tags: [] as string[]
   });
 
-  // Chargement des données d'analyse depuis localStorage pour démo
+  // Chargement des données d'analyse depuis localStorage
   useEffect(() => {
     try {
       // Effacer les états précédents pour éviter de mélanger les données
@@ -95,7 +95,7 @@ const CallSummaryPage = () => {
       console.error('Erreur lors du chargement de l\'analyse:', error);
       setLoadError(`Erreur lors du chargement de l'analyse: ${error.message}`);
     }
-  }, [id]); // Ne pas retirer id ici, car on veut réagir aux changements de route
+  }, [id]); // id dans la dépendance pour recharger si l'URL change
 
   const handleGoBack = () => {
     navigate(-1);
@@ -120,6 +120,17 @@ const CallSummaryPage = () => {
   };
 
   const handleSendEmail = () => {
+    // Mise à jour de l'email dans localStorage avant d'envoyer
+    const savedAnalysis = localStorage.getItem('callAnalysis');
+    if (savedAnalysis) {
+      const analysis = JSON.parse(savedAnalysis);
+      analysis.follow_up_email = {
+        subject: emailSubject,
+        body: emailBody
+      };
+      localStorage.setItem('callAnalysis', JSON.stringify(analysis));
+    }
+    
     toast.success("Email envoyé avec succès");
     navigate("/calls");
   };
