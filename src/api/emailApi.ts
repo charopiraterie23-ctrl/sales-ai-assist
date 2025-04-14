@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Email } from '@/types/dashboardTypes';
 
@@ -25,7 +24,7 @@ export const sendEmail = async (emailId: string): Promise<{ success: boolean; me
   }
 };
 
-export const updateEmailStatus = async (emailId: string, status: 'à envoyer' | 'envoyé' | 'brouillon'): Promise<boolean> => {
+export const updateEmailStatus = async (emailId: string, status: 'à envoyer' | 'envoyé' | 'échoué'): Promise<boolean> => {
   try {
     const { error } = await supabase
       .from('followup_emails')
