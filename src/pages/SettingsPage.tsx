@@ -1,24 +1,34 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   User, Lock, Settings as SettingsIcon, Link as LinkIcon, 
-  CreditCard, HelpCircle, LogOut 
+  CreditCard, HelpCircle, LogOut, Camera, Check, Loader2
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useEmailConnection } from '@/hooks/useEmailConnection';
 import { toast } from '@/components/ui/sonner';
 
 const SettingsPage = () => {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, updateProfile } = useAuth();
   const { connectEmail, disconnectEmail, connectedAccounts } = useEmailConnection();
   const [aiTone, setAITone] = useState('professional');
   const [emailLanguage, setEmailLanguage] = useState('french');
   const [summaryStructure, setSummaryStructure] = useState('points');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phoneNumber: '',
+  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleEmailConnect = (provider: 'gmail' | 'outlook') => {
     connectEmail(provider);
@@ -28,6 +38,48 @@ const SettingsPage = () => {
     const result = await disconnectEmail(provider);
     if (result) {
       toast.success(`Compte ${provider === 'gmail' ? 'Gmail' : 'Outlook'} déconnecté`);
+    }
+  };
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // Save changes
+      setIsLoading(true);
+      
+      // Simulating an API call
+      setTimeout(() => {
+        // In a real app, you would call updateProfile here
+        toast.success('Profil mis à jour avec succès');
+        setIsLoading(false);
+        setIsEditing(false);
+      }, 1000);
+    } else {
+      // Enter edit mode and populate form with current values
+      if (profile) {
+        setFormData({
+          fullName: profile.full_name,
+          phoneNumber: profile.phone_number || '',
+        });
+      }
+      setIsEditing(true);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Here you would upload the file to your storage
+      // For this example, we'll just show a success message
+      toast.success('Photo de profil mise à jour');
     }
   };
 
@@ -44,17 +96,87 @@ const SettingsPage = () => {
       <div className="space-y-8 max-w-2xl mx-auto">
         {/* 1. Bloc : Profil personnel */}
         <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <User className="mr-2" /> Profil personnel
-          </h2>
-          <div className="flex items-center space-x-4 mb-4">
-            <Avatar className="h-16 w-16">
-              <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold flex items-center">
+              <User className="mr-2" /> Profil personnel
+            </h2>
+            <Button
+              onClick={handleEditToggle}
+              variant={isEditing ? "default" : "outline"}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : isEditing ? (
+                <Check className="mr-2 h-4 w-4" />
+              ) : null}
+              {isEditing ? "Enregistrer" : "Modifier"}
+            </Button>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="relative" onClick={isEditing ? handleAvatarClick : undefined}>
+                <Avatar className={`h-16 w-16 ${isEditing ? 'cursor-pointer hover:opacity-80' : ''}`}>
+                  <AvatarImage src={profile.avatar_url || ''} alt={profile.full_name} />
+                  <AvatarFallback>{initials}</AvatarFallback>
+                  {isEditing && (
+                    <div className="absolute bottom-0 right-0 bg-primary rounded-full p-1">
+                      <Camera className="h-3 w-3 text-white" />
+                    </div>
+                  )}
+                </Avatar>
+                {isEditing && (
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept="image/*"
+                  />
+                )}
+              </div>
+              
+              <div className="flex-1">
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <div>
+                      <Label htmlFor="fullName">Nom complet</Label>
+                      <Input
+                        id="fullName"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phoneNumber">Numéro de téléphone</Label>
+                      <Input
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleInputChange}
+                        placeholder="+33 6 12 34 56 78"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="font-medium">{profile.full_name}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                    {profile.phone_number && (
+                      <p className="text-sm text-gray-500">{profile.phone_number}</p>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+            
             <div>
-              <p className="font-medium">{profile.full_name}</p>
-              <p className="text-sm text-gray-500">{user.email}</p>
+              <Label className="text-sm text-gray-500">Type de compte</Label>
+              <p className="text-sm font-medium">
+                {profile.plan === 'pro' ? 'Pro' : 'Gratuit'}
+              </p>
             </div>
           </div>
         </div>
