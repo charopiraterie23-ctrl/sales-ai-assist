@@ -15,9 +15,14 @@ const DashboardPage = () => {
   const [isFirstLogin, setIsFirstLogin] = useState(true);
   const [hasRecentCall, setHasRecentCall] = useState(false);
   
-  const userPlan = profile?.plan || 'free';
+  // Explicitly ensure that we're properly checking the plan
+  const userPlan = profile?.plan?.toLowerCase() || 'free';
 
   useEffect(() => {
+    // For debugging purposes
+    console.log("Current user profile:", profile);
+    console.log("User plan detected:", userPlan);
+    
     // Rotate tips every 10 seconds
     const interval = setInterval(() => {
       setTipIndex((prev) => {
@@ -27,7 +32,7 @@ const DashboardPage = () => {
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [userPlan]);
+  }, [userPlan, profile]);
 
   // Sample data - in real app, would be fetched from Supabase
   const callsUsed = userPlan === 'pro' ? 34 : 2;
@@ -52,10 +57,8 @@ const DashboardPage = () => {
         />
 
         {/* Render based on plan */}
-        {userPlan === 'free' ? (
-          <FreeDashboardContent 
-            isFirstLogin={isFirstLogin} 
-            hasRecentCall={hasRecentCall}
+        {userPlan === 'pro' ? (
+          <ProDashboardContent 
             navigate={navigate}
             tipIndex={tipIndex}
             callsUsed={callsUsed}
@@ -63,7 +66,9 @@ const DashboardPage = () => {
             usagePercentage={usagePercentage}
           />
         ) : (
-          <ProDashboardContent 
+          <FreeDashboardContent 
+            isFirstLogin={isFirstLogin} 
+            hasRecentCall={hasRecentCall}
             navigate={navigate}
             tipIndex={tipIndex}
             callsUsed={callsUsed}

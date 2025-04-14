@@ -28,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log("Auth state change:", event);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -43,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log("Got existing session:", currentSession?.user?.id);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       
@@ -60,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log("Fetching profile for user:", userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -71,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      console.log("Profile data fetched:", data);
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
