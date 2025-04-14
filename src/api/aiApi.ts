@@ -26,7 +26,14 @@ export const analyzeCallTranscript = async (
       throw new Error("Transcription vide");
     }
     
-    // Note: Removing the options parameter that was causing the build error
+    // Stocker les métadonnées de l'appel dans localStorage
+    localStorage.setItem('callMetadata', JSON.stringify({
+      clientName,
+      duration,
+      company: 'Entreprise', // Valeur par défaut, à remplacer par une vraie valeur si disponible
+      date: new Date().toISOString()
+    }));
+    
     const { data, error } = await supabase.functions.invoke('analyze-call', {
       body: {
         transcript,
@@ -58,6 +65,10 @@ export const analyzeCallTranscript = async (
     }
     
     console.log('Analyse reçue avec succès:', data);
+    
+    // Stocker les données d'analyse dans localStorage
+    localStorage.setItem('callAnalysis', JSON.stringify(data));
+    
     return data as AnalysisResult;
   } catch (error) {
     console.error('Erreur détaillée lors de l\'analyse de l\'appel:', error);

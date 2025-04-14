@@ -23,20 +23,44 @@ const CallSummaryPage = () => {
   const [keyPoints, setKeyPoints] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [analysisLoaded, setAnalysisLoaded] = useState(false);
+  const [callData, setCallData] = useState({
+    date: new Date(),
+    duration: 0,
+    clientName: "",
+    company: "",
+    tags: [] as string[]
+  });
 
   // Chargement des données d'analyse depuis localStorage pour démo
-  // Dans un cas réel, vous les chargeriez depuis la base de données
   useEffect(() => {
     if (id === 'new') {
       const savedAnalysis = localStorage.getItem('callAnalysis');
+      console.log("Trying to load analysis from localStorage:", savedAnalysis ? "Found" : "Not found");
+      
       if (savedAnalysis) {
         try {
           const analysis = JSON.parse(savedAnalysis) as AnalysisResult;
+          console.log("Parsed analysis:", analysis);
+          
           setSummaryText(analysis.summary);
           setKeyPoints(analysis.key_points);
           setTags(analysis.tags);
           setEmailSubject(analysis.follow_up_email.subject);
           setEmailBody(analysis.follow_up_email.body);
+          
+          // Récupérer les metadata de l'appel
+          const callMetadata = localStorage.getItem('callMetadata');
+          if (callMetadata) {
+            const metadata = JSON.parse(callMetadata);
+            setCallData({
+              date: new Date(),
+              duration: metadata.duration || 0,
+              clientName: metadata.clientName || "Client",
+              company: metadata.company || "Entreprise",
+              tags: analysis.tags
+            });
+          }
+          
           setAnalysisLoaded(true);
         } catch (error) {
           console.error('Erreur lors du chargement de l\'analyse:', error);
@@ -63,15 +87,6 @@ const CallSummaryPage = () => {
   const handleSendEmail = () => {
     toast.success("Email envoyé avec succès");
     navigate("/calls");
-  };
-
-  // Mock data for the call
-  const callData = {
-    date: new Date(2023, 3, 15, 14, 30),
-    duration: 840, // 14 minutes
-    clientName: id === 'new' ? "Jean Dupont" : "Jean Dupont",
-    company: id === 'new' ? "ABC Technologies" : "ABC Technologies",
-    tags: tags.length > 0 ? tags : ["prix", "besoins", "timing"]
   };
 
   return (
@@ -116,8 +131,8 @@ const CallSummaryPage = () => {
           </div>
           
           <div className="flex flex-wrap gap-1 mb-2">
-            {callData.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs flex items-center gap-1">
+            {callData.tags.map((tag, index) => (
+              <Badge key={index} variant="secondary" className="text-xs flex items-center gap-1">
                 <Tag size={10} />
                 {tag}
               </Badge>
@@ -172,7 +187,7 @@ const CallSummaryPage = () => {
                 />
               ) : (
                 <div className="prose dark:prose-invert max-w-none">
-                  <p>{summaryText || "Le client a exprimé un intérêt marqué pour notre solution Premium. Points clés abordés : budget de 5000€, besoin de flexibilité sur les délais de livraison, et interrogations sur le service après-vente. Nous avons convenu d'une démo le 20 avril avec leur équipe technique."}</p>
+                  <p>{summaryText || "Aucun résumé disponible pour cet appel."}</p>
                 </div>
               )}
             </div>
@@ -193,32 +208,7 @@ const CallSummaryPage = () => {
                     </li>
                   ))
                 ) : (
-                  <>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
-                        1
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300">Budget de 5000€ confirmé pour le projet</p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
-                        2
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300">Besoin de flexibilité sur les délais de livraison</p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
-                        3
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300">Interrogations sur notre service après-vente 24/7</p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
-                        4
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300">Démo planifiée le 20 avril avec l'équipe technique</p>
-                    </li>
-                  </>
+                  <li className="text-gray-500">Aucun point clé disponible pour cet appel.</li>
                 )}
               </ul>
             </div>
