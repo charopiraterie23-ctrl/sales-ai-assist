@@ -1,6 +1,4 @@
 
-# A string used to distinguish different Supabase projects on the same host. Defaults to the working
-# directory name when running `supabase init`.
 project_id = "xqetqqjcmjdcnnswtgho"
 
 [api]
@@ -8,10 +6,11 @@ project_id = "xqetqqjcmjdcnnswtgho"
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. Public and storage are always included.
-schemas = ["public", "storage", "graphql_public"]
+schemas = ["public", "storage", "extensions"]
 # Extra schemas to add to the search_path of every request. public is always included.
-extra_search_path = ["public", "extensions"]
-# Max rows returns in a single response by default
+extra_search_path = ["extensions"]
+# Maximum rows returns from a view, table, or stored procedure. Limits payload size for accidental
+# large queries. Default is 1000.
 max_rows = 1000
 
 [db]
@@ -62,24 +61,22 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 
-[auth.sms]
-# Allow/disallow new user signups via SMS to your project.
-enable_signup = true
-# If enabled, users need to confirm their phone number before signing in.
-enable_confirmations = false
-
-[auth.external.github]
+# Use an external OAuth provider. The full list of providers are: "apple", "azure", "bitbucket",
+# "discord", "facebook", "github", "gitlab", "google", "keycloak", "linkedin", "notion", "twitch",
+# "twitter", "slack", "spotify", "workos", "zoom".
+[auth.external.apple]
 enabled = false
 client_id = ""
 secret = ""
 # Overrides the default auth redirectUrl.
 redirect_uri = ""
-# Overrides the default auth provider URL. Used to support self-hosted GitLab installations.
+# Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
+# or any other third-party OIDC providers.
 url = ""
 
 [functions]
-# Port to bind a functions server to when running supabase functions locally
-port = 54328
+# Port to use for Functions server.
+port = 54321
 
 [functions.connect-email]
 verify_jwt = true
@@ -89,3 +86,14 @@ verify_jwt = false
 
 [functions.send-email]
 verify_jwt = true
+
+[functions.get-email-tokens]
+verify_jwt = true
+
+[functions.delete-email-token]
+verify_jwt = true
+
+[analytics]
+enabled = false
+port = 54327
+vector_port = 54328

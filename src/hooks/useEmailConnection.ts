@@ -54,22 +54,21 @@ export const useEmailConnection = () => {
         return;
       }
       
-      // Récupérer les tokens email de l'utilisateur
-      // Utilisation de rpc pour éviter le problème de typage
-      const { data: tokens, error } = await supabase.rpc('get_email_tokens', {
-        user_uuid: session.session.user.id
+      // Appel direct à l'API REST pour éviter les problèmes de typage
+      const { data, error } = await supabase.functions.invoke('get-email-tokens', {
+        body: { user_id: session.session.user.id }
       });
       
       if (error) {
         console.error('Erreur lors de la récupération des comptes email:', error);
         setConnectedAccounts([]);
       } else {
-        // Fallback si la fonction rpc n'existe pas encore
-        const accounts: EmailAccount[] = tokens ? tokens.map((token: any) => ({
+        const tokens = data?.tokens || [];
+        const accounts: EmailAccount[] = tokens.map((token: any) => ({
           provider: token.provider as 'gmail' | 'outlook',
           email: token.email,
           connected: true
-        })) : [];
+        }));
         
         setConnectedAccounts(accounts);
       }
@@ -130,10 +129,12 @@ export const useEmailConnection = () => {
         return false;
       }
       
-      // Appeler une fonction RPC pour supprimer le token
-      const { error } = await supabase.rpc('delete_email_token', {
-        user_uuid: session.session.user.id,
-        provider_name: provider
+      // Appel direct à l'API REST pour éviter les problèmes de typage
+      const { error } = await supabase.functions.invoke('delete-email-token', {
+        body: { 
+          user_id: session.session.user.id,
+          provider
+        }
       });
       
       if (error) {
