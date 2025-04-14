@@ -25,8 +25,9 @@ const LoginPage = () => {
     }
   };
 
+  // Redirect to dashboard instead of calls if user is logged in
   if (user) {
-    return <Navigate to="/calls" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

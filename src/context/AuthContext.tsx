@@ -129,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Redirect to dashboard instead of calls
       navigate('/dashboard');
     } catch (error: any) {
       toast({
