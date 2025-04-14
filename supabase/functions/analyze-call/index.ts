@@ -21,7 +21,10 @@ serve(async (req) => {
   if (!openAIApiKey) {
     console.error('La clé API OpenAI n\'est pas configurée');
     return new Response(
-      JSON.stringify({ error: 'Configuration OpenAI manquante' }),
+      JSON.stringify({ 
+        error: 'Configuration OpenAI manquante',
+        errorType: 'configuration'
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -80,9 +83,26 @@ Réponds en français au format JSON avec la structure suivante:
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Erreur API OpenAI:', errorData);
+        
+        // Identifier le type d'erreur spécifique
+        let errorType = 'api';
+        let errorMessage = 'Erreur lors de l\'appel à OpenAI';
+        
+        if (errorData.error && errorData.error.code === 'insufficient_quota') {
+          errorType = 'quota';
+          errorMessage = 'Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI.';
+        } else if (errorData.error && errorData.error.code === 'invalid_api_key') {
+          errorType = 'api_key';
+          errorMessage = 'Clé API OpenAI invalide.';
+        }
+        
         return new Response(
-          JSON.stringify({ error: 'Erreur lors de l\'appel à OpenAI', details: errorData }),
-          { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ 
+            error: errorMessage, 
+            errorType: errorType,
+            details: errorData 
+          }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
@@ -122,7 +142,10 @@ Réponds en français au format JSON avec la structure suivante:
     } catch (apiError) {
       console.error('Erreur lors de l\'appel à l\'API OpenAI:', apiError);
       return new Response(
-        JSON.stringify({ error: apiError.message }),
+        JSON.stringify({ 
+          error: apiError.message, 
+          errorType: 'api' 
+        }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -130,7 +153,10 @@ Réponds en français au format JSON avec la structure suivante:
   } catch (error) {
     console.error('Erreur dans la fonction analyze-call:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        errorType: 'unknown' 
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
