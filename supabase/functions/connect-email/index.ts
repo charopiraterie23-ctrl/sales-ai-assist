@@ -54,9 +54,24 @@ const handler = async (req: Request): Promise<Response> => {
     const state = JSON.stringify({ user_id, provider }); // Pour récupérer l'info au callback
     
     if (provider === "gmail") {
-      authUrl = `${GMAIL_AUTH_URL}?client_id=${GMAIL_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/gmail.send&state=${encodeURIComponent(state)}`;
+      // Amélioration des scopes pour Gmail
+      const scopes = [
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/userinfo.email",
+        "https://www.googleapis.com/auth/userinfo.profile"
+      ].join(" ");
+      
+      authUrl = `${GMAIL_AUTH_URL}?client_id=${GMAIL_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(scopes)}&access_type=offline&prompt=consent&state=${encodeURIComponent(state)}`;
     } else if (provider === "outlook") {
-      authUrl = `${OUTLOOK_AUTH_URL}?client_id=${OUTLOOK_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=mail.send&state=${encodeURIComponent(state)}`;
+      // Amélioration des scopes pour Outlook
+      const scopes = [
+        "Mail.Send",
+        "Mail.Send.Shared",
+        "User.Read",
+        "offline_access"
+      ].join(" ");
+      
+      authUrl = `${OUTLOOK_AUTH_URL}?client_id=${OUTLOOK_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${encodeURIComponent(state)}`;
     } else {
       return new Response(
         JSON.stringify({ error: "Invalid provider" }),

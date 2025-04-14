@@ -1,13 +1,15 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mail, Send, Loader2 } from 'lucide-react';
+import { Mail, Send, Loader2, Check, X, ExternalLink } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Email } from '@/types/dashboardTypes';
 import { sendEmail } from '@/api/emailApi';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useEmailConnection } from '@/hooks/useEmailConnection';
+import { Badge } from '@/components/ui/badge';
 
 interface ReadyEmailsCardProps {
   isEmailConnected: boolean;
@@ -27,6 +29,22 @@ const ReadyEmailsCard = ({
   const { toast } = useToast();
   const [sendingEmailId, setSendingEmailId] = useState<string | null>(null);
   const [emailPreview, setEmailPreview] = useState<Email | null>(null);
+  const [showConnectDialog, setShowConnectDialog] = useState(false);
+  const { 
+    connectEmail, 
+    disconnectEmail, 
+    connectedAccounts, 
+    isLoading: isLoadingAccounts,
+    refreshAccounts
+  } = useEmailConnection();
+
+  // Si isEmailConnected est false mais que nous avons des comptes connectés, mettre à jour
+  useEffect(() => {
+    if (!isEmailConnected && connectedAccounts.length > 0) {
+      // Ce cas ne devrait pas arriver, mais au cas où
+      if (onRefresh) onRefresh();
+    }
+  }, [isEmailConnected, connectedAccounts, onRefresh]);
 
   const handleSendEmail = async (email: Email) => {
     setSendingEmailId(email.id);
@@ -63,6 +81,13 @@ const ReadyEmailsCard = ({
   const handlePreviewEmail = (email: Email) => {
     setEmailPreview(email);
   };
+
+  const handleDisconnectAccount = async (provider: 'gmail' | 'outlook') => {
+    const success = await disconnectEmail(provider);
+    if (success && onRefresh) {
+      await onRefresh();
+    }
+  };
   
   if (isLoading) {
     return (
@@ -83,7 +108,18 @@ const ReadyEmailsCard = ({
   return (
     <Card className="animate-slide-up">
       <CardHeader className="pb-2">
-        <h3 className="text-lg font-semibold">Emails prêts à l'envoi</h3>
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">Emails prêts à l'envoi</h3>
+          {isEmailConnected && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowConnectDialog(true)}
+            >
+              Gérer les comptes email
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {isEmailConnected ? (
@@ -140,13 +176,21 @@ const ReadyEmailsCard = ({
             <p className="text-sm text-gray-600 mb-3">
               Activez l'envoi direct depuis nexentry en connectant votre compte Gmail ou Outlook
             </p>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={onConnectEmail}
-            >
-              Connecter mon compte email
-            </Button>
+            <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+              <Button 
+                className="flex-1"
+                onClick={() => connectEmail('gmail')}
+              >
+                <Mail className="h-4 w-4 mr-2" /> Connecter Gmail
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => connectEmail('outlook')}
+              >
+                <Mail className="h-4 w-4 mr-2" /> Connecter Outlook
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
@@ -205,6 +249,105 @@ const ReadyEmailsCard = ({
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de gestion des comptes email */}
+      <Dialog open={showConnectDialog} onOpenChange={setShowConnectDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Gérer vos comptes email</DialogTitle>
+            <DialogDescription>
+              Connectez ou déconnectez vos comptes email pour l'envoi direct depuis nexentry
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            {isLoadingAccounts ? (
+              <div className="space-y-2">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  <h4 className="text-sm font-medium">Comptes connectés</h4>
+                  
+                  {connectedAccounts.length === 0 ? (
+                    <p className="text-sm text-gray-500">Aucun compte email connecté</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {connectedAccounts.map((account) => (
+                        <div key={account.provider} className="flex items-center justify-between p-3 border rounded-md">
+                          <div className="flex items-center space-x-3">
+                            <Check className="h-5 w-5 text-green-500" />
+                            <div>
+                              <div className="flex items-center">
+                                <span className="font-medium">
+                                  {account.provider === 'gmail' ? 'Gmail' : 'Outlook'}
+                                </span>
+                                <Badge variant="outline" className="ml-2 text-xs">
+                                  {account.provider}
+                                </Badge>
+                              </div>
+                              {account.email && (
+                                <p className="text-sm text-gray-500">{account.email}</p>
+                              )}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDisconnectAccount(account.provider)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-medium mb-3">Connecter un nouveau compte</h4>
+                  <div className="flex flex-col space-y-2">
+                    <Button
+                      variant={connectedAccounts.some(a => a.provider === 'gmail') ? 'outline' : 'default'}
+                      onClick={() => connectEmail('gmail')}
+                      disabled={connectedAccounts.some(a => a.provider === 'gmail')}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      {connectedAccounts.some(a => a.provider === 'gmail') 
+                        ? 'Gmail déjà connecté' 
+                        : 'Connecter Gmail'}
+                    </Button>
+                    <Button
+                      variant={connectedAccounts.some(a => a.provider === 'outlook') ? 'outline' : 'default'}
+                      onClick={() => connectEmail('outlook')}
+                      disabled={connectedAccounts.some(a => a.provider === 'outlook')}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      {connectedAccounts.some(a => a.provider === 'outlook') 
+                        ? 'Outlook déjà connecté' 
+                        : 'Connecter Outlook'}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+            
+            <div className="pt-2 border-t">
+              <a 
+                href="https://console.cloud.google.com/apis/credentials" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center text-sm text-gray-500 hover:text-gray-700"
+              >
+                <ExternalLink className="h-3 w-3 mr-1" />
+                Documentation API OAuth
+              </a>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </Card>

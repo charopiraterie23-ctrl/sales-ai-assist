@@ -1,12 +1,25 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+interface EmailAccount {
+  provider: 'gmail' | 'outlook';
+  email?: string;
+  connected: boolean;
+}
+
 export const useEmailConnection = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [connectedAccounts, setConnectedAccounts] = useState<EmailAccount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Charger les comptes connectés au montage
+  useEffect(() => {
+    loadConnectedAccounts();
+  }, []);
 
   // Vérifier si le paramètre email_connected est présent dans l'URL
   useEffect(() => {
@@ -23,8 +36,49 @@ export const useEmailConnection = () => {
       
       // Nettoyer l'URL après affichage du toast
       navigate('/dashboard', { replace: true });
+      
+      // Recharger les comptes connectés
+      loadConnectedAccounts();
     }
   }, [navigate, toast]);
+
+  // Fonction pour charger les comptes email connectés
+  const loadConnectedAccounts = async () => {
+    setIsLoading(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session) {
+        setConnectedAccounts([]);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Récupérer les tokens email de l'utilisateur
+      const { data: tokens, error } = await supabase
+        .from('email_tokens')
+        .select('provider, email')
+        .eq('user_id', session.session.user.id);
+      
+      if (error) {
+        console.error('Erreur lors de la récupération des comptes email:', error);
+        setConnectedAccounts([]);
+      } else {
+        const accounts: EmailAccount[] = tokens?.map(token => ({
+          provider: token.provider as 'gmail' | 'outlook',
+          email: token.email,
+          connected: true
+        })) || [];
+        
+        setConnectedAccounts(accounts);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification des comptes email:', error);
+      setConnectedAccounts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Fonction pour connecter un compte email
   const connectEmail = async (provider: 'gmail' | 'outlook') => {
@@ -66,5 +120,66 @@ export const useEmailConnection = () => {
     }
   };
 
-  return { connectEmail };
+  // Fonction pour déconnecter un compte email
+  const disconnectEmail = async (provider: 'gmail' | 'outlook') => {
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      
+      if (!session.session) {
+        return false;
+      }
+      
+      // Supprimer le token de la base de données
+      const { error } = await supabase
+        .from('email_tokens')
+        .delete()
+        .eq('user_id', session.session.user.id)
+        .eq('provider', provider);
+      
+      if (error) {
+        console.error('Erreur lors de la déconnexion du compte email:', error);
+        toast({
+          title: "Échec de la déconnexion",
+          description: "Impossible de déconnecter votre compte email. Veuillez réessayer plus tard.",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      // Vérifier s'il reste des comptes connectés
+      const { data: remainingTokens } = await supabase
+        .from('email_tokens')
+        .select('id')
+        .eq('user_id', session.session.user.id);
+      
+      // Si aucun compte n'est connecté, mettre à jour email_synced à false
+      if (!remainingTokens || remainingTokens.length === 0) {
+        await supabase
+          .from('profiles')
+          .update({ email_synced: false })
+          .eq('id', session.session.user.id);
+      }
+      
+      // Recharger les comptes connectés
+      await loadConnectedAccounts();
+      
+      toast({
+        title: "Compte déconnecté",
+        description: `Votre compte ${provider === 'gmail' ? 'Gmail' : 'Outlook'} a été déconnecté avec succès.`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion du compte email:', error);
+      return false;
+    }
+  };
+
+  return { 
+    connectEmail, 
+    disconnectEmail, 
+    connectedAccounts, 
+    isLoading,
+    refreshAccounts: loadConnectedAccounts
+  };
 };
