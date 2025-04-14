@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 type AuthContextType = {
   session: Session | null;
@@ -103,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: 'Vous pouvez maintenant vous connecter.',
       });
       
-      navigate('/login');
+      navigate('/');
     } catch (error: any) {
       toast({
         title: 'Erreur',

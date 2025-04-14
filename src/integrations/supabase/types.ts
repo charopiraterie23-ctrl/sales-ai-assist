@@ -71,6 +71,7 @@ export type Database = {
           notes: string | null
           phone: string | null
           status: Database["public"]["Enums"]["client_status"] | null
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -83,6 +84,7 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["client_status"] | null
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -95,6 +97,7 @@ export type Database = {
           notes?: string | null
           phone?: string | null
           status?: Database["public"]["Enums"]["client_status"] | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -117,6 +120,7 @@ export type Database = {
           subject: string
           summary_id: string
           to_email: string
+          updated_at: string
         }
         Insert: {
           body: string
@@ -127,6 +131,7 @@ export type Database = {
           subject: string
           summary_id: string
           to_email: string
+          updated_at?: string
         }
         Update: {
           body?: string
@@ -137,6 +142,7 @@ export type Database = {
           subject?: string
           summary_id?: string
           to_email?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -227,7 +233,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_audio_url: {
+        Args: { file_path: string }
+        Returns: string
+      }
+      get_user_stats: {
+        Args: { user_uuid: string }
+        Returns: {
+          total_calls: number
+          total_clients: number
+          total_followups: number
+          recent_activity: Json
+        }[]
+      }
     }
     Enums: {
       call_source: "upload" | "enregistrement"
