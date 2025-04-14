@@ -5,6 +5,7 @@ import HeroSection from "@/components/sections/HeroSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HowItWorksSection from "@/components/sections/HowItWorksSection";
 import PricingSection from "@/components/sections/PricingSection";
+import FAQSection from "@/components/sections/FAQSection";
 import CTASection from "@/components/sections/CTASection";
 import HomeFooter from "@/components/layout/HomeFooter";
 
@@ -16,6 +17,7 @@ const HomePage = () => {
       <FeaturesSection />
       <HowItWorksSection />
       <PricingSection />
+      <FAQSection />
       <CTASection />
       <HomeFooter />
     </div>
