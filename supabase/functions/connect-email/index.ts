@@ -61,7 +61,7 @@ const handler = async (req: Request): Promise<Response> => {
         "https://www.googleapis.com/auth/userinfo.profile"
       ].join(" ");
       
-      authUrl = `${GMAIL_AUTH_URL}?client_id=${GMAIL_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(scopes)}&access_type=offline&prompt=consent&state=${encodeURIComponent(state)}`;
+      authUrl = `${GMAIL_AUTH_URL}?client_id=${GMAIL_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&access_type=offline&prompt=consent&state=${encodeURIComponent(state)}`;
     } else if (provider === "outlook") {
       // Amélioration des scopes pour Outlook
       const scopes = [
@@ -71,13 +71,15 @@ const handler = async (req: Request): Promise<Response> => {
         "offline_access"
       ].join(" ");
       
-      authUrl = `${OUTLOOK_AUTH_URL}?client_id=${OUTLOOK_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${encodeURIComponent(state)}`;
+      authUrl = `${OUTLOOK_AUTH_URL}?client_id=${OUTLOOK_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${encodeURIComponent(state)}`;
     } else {
       return new Response(
         JSON.stringify({ error: "Invalid provider" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log(`Auth URL generated for ${provider}:`, authUrl);
 
     // Renvoyer l'URL d'autorisation pour redirection côté client
     return new Response(

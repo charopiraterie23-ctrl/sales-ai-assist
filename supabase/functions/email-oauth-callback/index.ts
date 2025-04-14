@@ -28,17 +28,43 @@ const handler = async (req: Request): Promise<Response> => {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");
   const stateParam = url.searchParams.get("state");
+  const errorParam = url.searchParams.get("error");
+  
+  console.log("OAuth callback received:", { code: code?.substring(0, 5) + "...", state: stateParam, error: errorParam });
+  
+  if (errorParam) {
+    console.error("OAuth error:", errorParam);
+    return new Response(`Authentication failed: ${errorParam}`, {
+      status: 400,
+      headers: {
+        "Content-Type": "text/html"
+      }
+    });
+  }
   
   if (!code || !stateParam) {
-    return new Response("Missing authorization code or state", { status: 400 });
+    console.error("Missing authorization code or state");
+    return new Response("Missing authorization code or state", { 
+      status: 400,
+      headers: {
+        "Content-Type": "text/html"
+      }
+    });
   }
 
   try {
     // Décoder l'état pour récupérer user_id et provider
     const { user_id, provider } = JSON.parse(stateParam);
     
+    console.log("State decoded:", { user_id, provider });
+    
     if (!user_id || !provider) {
-      return new Response("Invalid state parameter", { status: 400 });
+      return new Response("Invalid state parameter", { 
+        status: 400,
+        headers: {
+          "Content-Type": "text/html"
+        }
+      });
     }
 
     // Échanger le code contre un token selon le provider
@@ -65,9 +91,16 @@ const handler = async (req: Request): Promise<Response> => {
         grant_type: "authorization_code"
       });
     } else {
-      return new Response("Invalid provider", { status: 400 });
+      return new Response("Invalid provider", { 
+        status: 400,
+        headers: {
+          "Content-Type": "text/html"
+        }
+      });
     }
 
+    console.log(`Exchanging code for token with ${provider}`);
+    
     const response = await fetch(tokenUrl, {
       method: "POST",
       body: tokenBody,
@@ -79,10 +112,16 @@ const handler = async (req: Request): Promise<Response> => {
     if (!response.ok) {
       const errorData = await response.text();
       console.error("Token exchange error:", errorData);
-      return new Response(`Failed to exchange code: ${errorData}`, { status: response.status });
+      return new Response(`Failed to exchange code: ${errorData}`, { 
+        status: response.status,
+        headers: {
+          "Content-Type": "text/html"
+        }
+      });
     }
 
     const tokenData: TokenResponse = await response.json();
+    console.log(`Token obtained successfully from ${provider}`);
     
     // Calculer l'expiration du token
     const now = new Date();
@@ -104,7 +143,12 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (tokenError) {
       console.error("Supabase token storage error:", tokenError);
-      return new Response(`Failed to store tokens: ${tokenError.message}`, { status: 500 });
+      return new Response(`Failed to store tokens: ${tokenError.message}`, { 
+        status: 500,
+        headers: {
+          "Content-Type": "text/html"
+        }
+      });
     }
 
     // Mettre à jour le profil utilisateur
@@ -115,7 +159,6 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (error) {
       console.error("Supabase profile update error:", error);
-      return new Response(`Failed to update user profile: ${error.message}`, { status: 500 });
     }
 
     // Récupérer l'email de l'utilisateur pour le provider
@@ -131,6 +174,9 @@ const handler = async (req: Request): Promise<Response> => {
       if (userInfoResponse.ok) {
         const userInfo = await userInfoResponse.json();
         userEmail = userInfo.email;
+        console.log(`Retrieved Gmail email: ${userEmail}`);
+      } else {
+        console.error("Failed to get user info from Gmail");
       }
     } else if (provider === "outlook") {
       const userInfoResponse = await fetch("https://graph.microsoft.com/v1.0/me", {
@@ -142,6 +188,9 @@ const handler = async (req: Request): Promise<Response> => {
       if (userInfoResponse.ok) {
         const userInfo = await userInfoResponse.json();
         userEmail = userInfo.mail || userInfo.userPrincipalName;
+        console.log(`Retrieved Outlook email: ${userEmail}`);
+      } else {
+        console.error("Failed to get user info from Outlook");
       }
     }
     
@@ -154,16 +203,33 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     // Rediriger vers le dashboard avec un paramètre de succès
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: `/dashboard?email_connected=true&provider=${provider}`
+    console.log("Redirecting to dashboard with success parameters");
+    return new Response(
+      `<html>
+        <head>
+          <meta http-equiv="refresh" content="0;url=/dashboard?email_connected=true&provider=${provider}">
+          <title>Redirection</title>
+        </head>
+        <body>
+          <p>Redirection en cours...</p>
+        </body>
+      </html>`,
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "text/html"
+        }
       }
-    });
+    );
     
   } catch (error) {
     console.error("OAuth callback error:", error);
-    return new Response(`OAuth callback error: ${error.message}`, { status: 500 });
+    return new Response(`OAuth callback error: ${error.message}`, { 
+      status: 500,
+      headers: {
+        "Content-Type": "text/html"
+      }
+    });
   }
 };
 

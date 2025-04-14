@@ -54,7 +54,7 @@ export const useEmailConnection = () => {
         return;
       }
       
-      // Appel direct à l'API REST pour éviter les problèmes de typage
+      // Appel à l'edge function pour récupérer les tokens
       const { data, error } = await supabase.functions.invoke('get-email-tokens', {
         body: { user_id: session.session.user.id }
       });
@@ -82,39 +82,53 @@ export const useEmailConnection = () => {
 
   // Fonction pour connecter un compte email
   const connectEmail = async (provider: 'gmail' | 'outlook') => {
-    const session = await supabase.auth.getSession();
-    const userId = session.data.session?.user.id;
-    
-    if (!userId) return;
-    
     try {
-      const response = await fetch(`https://xqetqqjcmjdcnnswtgho.supabase.co/functions/v1/connect-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.data.session?.access_token}`
-        },
-        body: JSON.stringify({
-          provider,
-          user_id: userId
-        })
-      });
+      const { data: session } = await supabase.auth.getSession();
+      const userId = session.session?.user.id;
       
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
+      if (!userId) {
+        toast({
+          title: "Non connecté",
+          description: "Vous devez être connecté pour utiliser cette fonctionnalité.",
+          variant: "destructive",
+        });
+        return;
       }
       
-      const data = await response.json();
+      // Appel à l'edge function pour obtenir l'URL d'authentification
+      const { data, error } = await supabase.functions.invoke('connect-email', {
+        body: {
+          provider,
+          user_id: userId
+        }
+      });
+      
+      if (error) {
+        console.error('Erreur lors de la connexion du compte email:', error);
+        toast({
+          title: "Échec de la connexion",
+          description: "Impossible de connecter votre compte email. " + error.message,
+          variant: "destructive",
+        });
+        return;
+      }
       
       // Rediriger vers l'URL d'authentification
       if (data.auth_url) {
+        console.log("Redirection vers:", data.auth_url);
         window.location.href = data.auth_url;
+      } else {
+        toast({
+          title: "Erreur de configuration",
+          description: "URL d'authentification manquante. Veuillez contacter le support.",
+          variant: "destructive",
+        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur lors de la connexion du compte email:', error);
       toast({
         title: "Échec de la connexion",
-        description: "Impossible de connecter votre compte email. Veuillez réessayer plus tard.",
+        description: "Impossible de connecter votre compte email: " + error.message,
         variant: "destructive",
       });
     }
@@ -129,7 +143,7 @@ export const useEmailConnection = () => {
         return false;
       }
       
-      // Appel direct à l'API REST pour éviter les problèmes de typage
+      // Appel à l'edge function pour supprimer le token
       const { error } = await supabase.functions.invoke('delete-email-token', {
         body: { 
           user_id: session.session.user.id,
