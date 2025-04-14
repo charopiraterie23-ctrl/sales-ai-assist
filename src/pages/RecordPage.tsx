@@ -1,16 +1,19 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Upload, Circle, Square, Clock } from 'lucide-react';
+import { Mic, Upload, Circle, Square, Clock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/layout/Layout';
 import { toast } from 'sonner';
+import { analyzeCallTranscript } from '@/api/aiApi';
 
 const RecordPage = () => {
   const navigate = useNavigate();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [timer, setTimer] = useState<number | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [transcript, setTranscript] = useState('');
 
   const startRecording = () => {
     setIsRecording(true);
@@ -26,7 +29,7 @@ const RecordPage = () => {
     toast.info('Enregistrement démarré');
   };
 
-  const stopRecording = () => {
+  const stopRecording = async () => {
     setIsRecording(false);
     
     if (timer) {
@@ -36,22 +39,87 @@ const RecordPage = () => {
     
     toast.success('Enregistrement terminé');
     
-    // Simulate processing and redirect to call summary
-    setTimeout(() => {
+    // Simuler la transcription
+    setIsProcessing(true);
+    
+    try {
+      // Simulation de transcription (dans un vrai cas, vous recevriez ceci d'un service de transcription)
+      // Cet exemple utilise une transcription fictive pour démonstration
+      const mockTranscript = "Bonjour Jean, merci de prendre le temps de discuter aujourd'hui. " +
+        "Je voulais faire un suivi concernant notre dernière conversation sur l'implémentation du CRM. " +
+        "Est-ce que votre équipe a eu le temps de consulter la documentation que je vous ai envoyée ? " +
+        "Super, je suis content d'entendre que c'était utile. Concernant la formation, nous pouvons organiser une session la semaine prochaine. " +
+        "Le jeudi 20 à 14h vous conviendrait ? Parfait, je vais réserver cette date. " +
+        "Avez-vous d'autres questions sur le processus d'implémentation ? " +
+        "Je comprends votre préoccupation concernant la migration des données. " +
+        "Je vais vous mettre en contact avec notre spécialiste migration qui pourra vous aider avec ce point spécifique. " +
+        "Merci pour votre temps aujourd'hui, je vous envoie un récapitulatif par email.";
+      
+      setTranscript(mockTranscript);
+      
+      // Analyser la transcription avec l'API OpenAI
+      const result = await analyzeCallTranscript(
+        mockTranscript,
+        "Jean Dupont", // Dans un cas réel, ceci viendrait d'un sélecteur de client
+        recordingTime,
+        "Suivi d'implémentation CRM"
+      );
+      
+      // Stocker les résultats dans le localStorage pour la démo
+      // Dans un cas réel, vous les stockeriez dans votre base de données
+      localStorage.setItem('callAnalysis', JSON.stringify(result));
+      
+      // Rediriger vers le résumé d'appel
       navigate('/call-summary/new');
-    }, 1500);
+    } catch (error) {
+      console.error("Erreur lors de l'analyse de l'appel:", error);
+      toast.error("Erreur lors de l'analyse de l'appel. Veuillez réessayer.");
+      setIsProcessing(false);
+    }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     
     if (file) {
       toast.info(`Fichier "${file.name}" en cours de traitement...`);
+      setIsProcessing(true);
       
-      // Simulate processing and redirect to call summary
-      setTimeout(() => {
-        navigate('/call-summary/new');
-      }, 2000);
+      try {
+        // Simulation de transcription pour un fichier
+        // Dans un vrai cas, vous enverriez le fichier à un service de transcription
+        setTimeout(async () => {
+          const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
+            "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
+            "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
+            "Je comprends que le budget est une préoccupation ce trimestre. " +
+            "La bonne nouvelle est que nous pouvons vous proposer un tarif spécial si vous vous engagez pour 12 mois. " +
+            "Cela vous permettrait d'accéder à l'offre Premium pour quasiment le prix de l'offre Pro. " +
+            "Parfait, je vous envoie les détails de cette offre par email aujourd'hui. " +
+            "Avez-vous d'autres questions ? " +
+            "Excellent, merci pour votre temps et à bientôt !";
+          
+          setTranscript(mockTranscript);
+          
+          // Analyser la transcription avec l'API OpenAI
+          const result = await analyzeCallTranscript(
+            mockTranscript,
+            "Marc Dubois", // Dans un cas réel, ceci viendrait d'un sélecteur de client
+            780, // Durée simulée de 13 minutes
+            "Renouvellement de contrat"
+          );
+          
+          // Stocker les résultats dans le localStorage pour la démo
+          localStorage.setItem('callAnalysis', JSON.stringify(result));
+          
+          // Rediriger vers le résumé d'appel
+          navigate('/call-summary/new');
+        }, 2000);
+      } catch (error) {
+        console.error("Erreur lors de l'analyse du fichier:", error);
+        toast.error("Erreur lors de l'analyse du fichier. Veuillez réessayer.");
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -65,7 +133,17 @@ const RecordPage = () => {
   return (
     <Layout title="Enregistrer">
       <div className="flex flex-col items-center justify-center min-h-[70vh]">
-        {isRecording ? (
+        {isProcessing ? (
+          <div className="text-center">
+            <div className="w-20 h-20 mx-auto mb-6">
+              <Loader2 className="w-full h-full text-nexentry-blue animate-spin" />
+            </div>
+            <h3 className="text-xl font-medium mb-2">Analyse en cours</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              Notre IA analyse votre conversation pour générer un résumé et des suggestions...
+            </p>
+          </div>
+        ) : isRecording ? (
           <div className="text-center">
             <div className="relative mb-8">
               <div className="w-32 h-32 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">

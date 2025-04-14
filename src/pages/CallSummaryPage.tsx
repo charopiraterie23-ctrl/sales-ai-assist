@@ -1,7 +1,7 @@
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Calendar, Clock, Edit, Copy, SendHorizontal, User, Building } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Calendar, Clock, Edit, Copy, SendHorizontal, User, Building, Tag } from 'lucide-react';
 import { formatDuration, formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
@@ -10,34 +10,41 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/layout/Layout';
 import { toast } from 'sonner';
+import { AnalysisResult } from '@/api/aiApi';
 
 const CallSummaryPage = () => {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("resume");
   const [isEditing, setIsEditing] = useState(false);
-  const [summaryText, setSummaryText] = useState(
-    "Le client a exprimé un intérêt marqué pour notre solution Premium. Points clés abordés : budget de 5000€, besoin de flexibilité sur les délais de livraison, et interrogations sur le service après-vente. Nous avons convenu d'une démo le 20 avril avec leur équipe technique."
-  );
-  const [emailSubject, setEmailSubject] = useState("Suivi de notre conversation - Solution Premium");
-  const [emailBody, setEmailBody] = useState(
-    `Bonjour Jean,
+  const [summaryText, setSummaryText] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [keyPoints, setKeyPoints] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [analysisLoaded, setAnalysisLoaded] = useState(false);
 
-Merci pour notre échange téléphonique d'aujourd'hui concernant nos solutions Premium.
-
-Pour faire suite aux points que nous avons abordés :
-- J'ai bien noté votre budget de 5000€
-- Concernant les délais de livraison, nous pouvons nous adapter à votre calendrier
-- Notre service après-vente est disponible 24/7, comme vous l'avez demandé
-
-Je vous confirme notre rendez-vous pour une démonstration le 20 avril à 14h00. Je vous enverrai un lien de connexion la veille.
-
-N'hésitez pas à me contacter si vous avez d'autres questions d'ici là.
-
-Cordialement,
-Sophie Martin
-Nexentry
-06 12 34 56 78`
-  );
+  // Chargement des données d'analyse depuis localStorage pour démo
+  // Dans un cas réel, vous les chargeriez depuis la base de données
+  useEffect(() => {
+    if (id === 'new') {
+      const savedAnalysis = localStorage.getItem('callAnalysis');
+      if (savedAnalysis) {
+        try {
+          const analysis = JSON.parse(savedAnalysis) as AnalysisResult;
+          setSummaryText(analysis.summary);
+          setKeyPoints(analysis.key_points);
+          setTags(analysis.tags);
+          setEmailSubject(analysis.follow_up_email.subject);
+          setEmailBody(analysis.follow_up_email.body);
+          setAnalysisLoaded(true);
+        } catch (error) {
+          console.error('Erreur lors du chargement de l\'analyse:', error);
+          toast.error('Erreur lors du chargement de l\'analyse');
+        }
+      }
+    }
+  }, [id]);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -62,9 +69,9 @@ Nexentry
   const callData = {
     date: new Date(2023, 3, 15, 14, 30),
     duration: 840, // 14 minutes
-    clientName: "Jean Dupont",
-    company: "ABC Technologies",
-    tags: ["prix", "besoins", "timing"]
+    clientName: id === 'new' ? "Jean Dupont" : "Jean Dupont",
+    company: id === 'new' ? "ABC Technologies" : "ABC Technologies",
+    tags: tags.length > 0 ? tags : ["prix", "besoins", "timing"]
   };
 
   return (
@@ -110,7 +117,8 @@ Nexentry
           
           <div className="flex flex-wrap gap-1 mb-2">
             {callData.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
+              <Badge key={tag} variant="secondary" className="text-xs flex items-center gap-1">
+                <Tag size={10} />
                 {tag}
               </Badge>
             ))}
@@ -118,8 +126,9 @@ Nexentry
         </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="resume">Résumé</TabsTrigger>
+            <TabsTrigger value="points">Points clés</TabsTrigger>
             <TabsTrigger value="email">Email de suivi</TabsTrigger>
           </TabsList>
           
@@ -163,9 +172,55 @@ Nexentry
                 />
               ) : (
                 <div className="prose dark:prose-invert max-w-none">
-                  <p>{summaryText}</p>
+                  <p>{summaryText || "Le client a exprimé un intérêt marqué pour notre solution Premium. Points clés abordés : budget de 5000€, besoin de flexibilité sur les délais de livraison, et interrogations sur le service après-vente. Nous avons convenu d'une démo le 20 avril avec leur équipe technique."}</p>
                 </div>
               )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="points" className="pt-4">
+            <div className="nexentry-card">
+              <h3 className="font-medium mb-4">Points clés de la conversation</h3>
+              
+              <ul className="space-y-3">
+                {keyPoints.length > 0 ? (
+                  keyPoints.map((point, index) => (
+                    <li key={index} className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
+                        {index + 1}
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300">{point}</p>
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
+                        1
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300">Budget de 5000€ confirmé pour le projet</p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
+                        2
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300">Besoin de flexibilité sur les délais de livraison</p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
+                        3
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300">Interrogations sur notre service après-vente 24/7</p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-nexentry-blue/10 flex items-center justify-center text-nexentry-blue mr-2 mt-0.5">
+                        4
+                      </div>
+                      <p className="text-gray-700 dark:text-gray-300">Démo planifiée le 20 avril avec l'équipe technique</p>
+                    </li>
+                  </>
+                )}
+              </ul>
             </div>
           </TabsContent>
           
