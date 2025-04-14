@@ -6,10 +6,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
 const GMAIL_AUTH_URL = "https://accounts.google.com/o/oauth2/auth";
 const OUTLOOK_AUTH_URL = "https://login.microsoftonline.com/common/oauth2/v2.0/authorize";
 
-// Les identifiants seraient normalement stockés dans les variables d'environnement
+// Les identifiants sont récupérés depuis les variables d'environnement
 const GMAIL_CLIENT_ID = Deno.env.get("GMAIL_CLIENT_ID") || "";
 const OUTLOOK_CLIENT_ID = Deno.env.get("OUTLOOK_CLIENT_ID") || "";
 const REDIRECT_URI = Deno.env.get("EMAIL_OAUTH_REDIRECT_URI") || "";
+
+// Vérification des variables d'environnement requises
+if (!GMAIL_CLIENT_ID) console.warn("ATTENTION: GMAIL_CLIENT_ID non défini dans les variables d'environnement");
+if (!OUTLOOK_CLIENT_ID) console.warn("ATTENTION: OUTLOOK_CLIENT_ID non défini dans les variables d'environnement");
+if (!REDIRECT_URI) console.warn("ATTENTION: EMAIL_OAUTH_REDIRECT_URI non défini dans les variables d'environnement");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +38,33 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { provider, user_id }: ConnectEmailRequest = await req.json();
     
+    console.log(`Demande de connexion pour le provider ${provider} et l'utilisateur ${user_id}`);
+    
+    // Vérifier que les identifiants clients sont définis
+    if ((provider === "gmail" && !GMAIL_CLIENT_ID) || (provider === "outlook" && !OUTLOOK_CLIENT_ID)) {
+      console.error(`Erreur: ${provider === "gmail" ? "GMAIL_CLIENT_ID" : "OUTLOOK_CLIENT_ID"} n'est pas configuré`);
+      return new Response(
+        JSON.stringify({ 
+          error: `L'identifiant client pour ${provider} n'est pas configuré. Veuillez contacter l'administrateur.`,
+          env_check: {
+            gmail_client_id_defined: !!GMAIL_CLIENT_ID,
+            outlook_client_id_defined: !!OUTLOOK_CLIENT_ID,
+            redirect_uri_defined: !!REDIRECT_URI
+          }
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    // Vérifier que l'URL de redirection est définie
+    if (!REDIRECT_URI) {
+      console.error("Erreur: EMAIL_OAUTH_REDIRECT_URI n'est pas configuré");
+      return new Response(
+        JSON.stringify({ error: "L'URL de redirection n'est pas configurée. Veuillez contacter l'administrateur." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
     // Vérifier que l'utilisateur existe
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { data: profile, error } = await supabase
@@ -42,9 +74,9 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     if (error || !profile) {
-      console.error("User not found:", error);
+      console.error("Utilisateur non trouvé:", error);
       return new Response(
-        JSON.stringify({ error: "User not found" }),
+        JSON.stringify({ error: "Utilisateur non trouvé" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -61,7 +93,7 @@ const handler = async (req: Request): Promise<Response> => {
         "https://www.googleapis.com/auth/userinfo.profile"
       ].join(" ");
       
-      authUrl = `${GMAIL_AUTH_URL}?client_id=${GMAIL_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&access_type=offline&prompt=consent&state=${encodeURIComponent(state)}`;
+      authUrl = `${GMAIL_AUTH_URL}?client_id=${encodeURIComponent(GMAIL_CLIENT_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&access_type=offline&prompt=consent&state=${encodeURIComponent(state)}`;
     } else if (provider === "outlook") {
       // Amélioration des scopes pour Outlook
       const scopes = [
@@ -71,15 +103,15 @@ const handler = async (req: Request): Promise<Response> => {
         "offline_access"
       ].join(" ");
       
-      authUrl = `${OUTLOOK_AUTH_URL}?client_id=${OUTLOOK_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${encodeURIComponent(state)}`;
+      authUrl = `${OUTLOOK_AUTH_URL}?client_id=${encodeURIComponent(OUTLOOK_CLIENT_ID)}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${encodeURIComponent(state)}`;
     } else {
       return new Response(
-        JSON.stringify({ error: "Invalid provider" }),
+        JSON.stringify({ error: "Provider invalide" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Auth URL generated for ${provider}:`, authUrl);
+    console.log(`URL d'authentification générée pour ${provider}:`, authUrl);
 
     // Renvoyer l'URL d'autorisation pour redirection côté client
     return new Response(
@@ -90,7 +122,7 @@ const handler = async (req: Request): Promise<Response> => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error("Error in connect-email function:", error);
+    console.error("Erreur dans la fonction connect-email:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
