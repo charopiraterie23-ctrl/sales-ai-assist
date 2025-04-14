@@ -1,8 +1,8 @@
 
 import { Link } from 'react-router-dom';
-import { Bell, User } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserMenu from './UserMenu';
 
 interface HeaderProps {
   title: string;
@@ -45,14 +45,7 @@ const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => 
           <Button variant="ghost" size="icon" className="text-gray-500">
             <Bell size={20} />
           </Button>
-          <Link to="/settings">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="" alt="User" />
-              <AvatarFallback className="bg-nexentry-blue text-white">
-                <User size={16} />
-              </AvatarFallback>
-            </Avatar>
-          </Link>
+          <UserMenu />
         </div>
       </div>
     </header>
