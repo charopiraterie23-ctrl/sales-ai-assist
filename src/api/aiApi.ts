@@ -19,12 +19,16 @@ export const analyzeCallTranscript = async (
   context?: string
 ): Promise<AnalysisResult> => {
   try {
+    console.log(`Envoi d'une demande d'analyse - Longueur transcription: ${transcript.length} caractères`);
     console.log(`Envoi d'une demande d'analyse pour: ${clientName}, durée: ${duration}s`);
     
     if (!transcript || transcript.trim() === '') {
       toast.error("La transcription est vide. Impossible d'analyser l'appel.");
       throw new Error("Transcription vide");
     }
+    
+    // Supprimer les données précédentes pour éviter de les mélanger
+    localStorage.removeItem('callAnalysis');
     
     // Stocker les métadonnées de l'appel dans localStorage
     const callMetadata = {
@@ -67,6 +71,7 @@ export const analyzeCallTranscript = async (
     }
     
     console.log('Analyse reçue avec succès:', data);
+    console.log('Analyse terminée avec succès', data);
     
     // Stocker les données d'analyse complètes dans localStorage (avec les métadonnées)
     const completeAnalysis = {

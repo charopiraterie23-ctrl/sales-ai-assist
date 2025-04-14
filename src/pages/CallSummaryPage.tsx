@@ -34,74 +34,68 @@ const CallSummaryPage = () => {
 
   // Chargement des données d'analyse depuis localStorage pour démo
   useEffect(() => {
-    if (id === 'new') {
-      try {
-        console.log("Tentative de chargement de l'analyse depuis localStorage");
-        const savedAnalysis = localStorage.getItem('callAnalysis');
-        
-        if (!savedAnalysis) {
-          console.error("Aucune analyse trouvée dans localStorage");
-          setLoadError("Aucune analyse d'appel trouvée. Veuillez enregistrer un appel d'abord.");
-          return;
-        }
-        
-        console.log("Analyse trouvée:", savedAnalysis);
-        const analysis = JSON.parse(savedAnalysis) as AnalysisResult & {
-          clientName?: string;
-          duration?: number;
-          date?: string;
-        };
-        
-        console.log("Analyse parsée:", analysis);
-        
-        // Vérifier si l'analyse contient toutes les données nécessaires
-        if (!analysis.summary || !analysis.key_points || !analysis.tags || !analysis.follow_up_email) {
-          console.error("L'analyse ne contient pas toutes les données nécessaires");
-          setLoadError("L'analyse est incomplète. Veuillez réessayer l'enregistrement.");
-          return;
-        }
-        
-        setSummaryText(analysis.summary);
-        setKeyPoints(analysis.key_points);
-        setTags(analysis.tags);
-        setEmailSubject(analysis.follow_up_email.subject);
-        setEmailBody(analysis.follow_up_email.body);
-        
-        // Récupérer les metadata de l'appel
-        let callMetadata;
-        if (analysis.clientName && analysis.duration) {
-          // Si les métadonnées sont incluses dans l'analyse
-          callMetadata = {
-            clientName: analysis.clientName,
-            duration: analysis.duration,
-            date: analysis.date ? new Date(analysis.date) : new Date(),
-            company: "Entreprise" // Valeur par défaut
-          };
-        } else {
-          // Sinon, essayer de les obtenir séparément
-          const metadataStr = localStorage.getItem('callMetadata');
-          if (metadataStr) {
-            callMetadata = JSON.parse(metadataStr);
-          }
-        }
-        
-        if (callMetadata) {
-          setCallData({
-            date: new Date(callMetadata.date || new Date()),
-            duration: callMetadata.duration || 0,
-            clientName: callMetadata.clientName || "Client",
-            company: callMetadata.company || "Entreprise",
-            tags: analysis.tags
-          });
-        }
-        
-        setAnalysisLoaded(true);
-      } catch (error) {
-        console.error('Erreur lors du chargement de l\'analyse:', error);
-        setLoadError(`Erreur lors du chargement de l'analyse: ${error.message}`);
+    try {
+      // Effacer les états précédents pour éviter de mélanger les données
+      setSummaryText("");
+      setKeyPoints([]);
+      setTags([]);
+      setEmailSubject("");
+      setEmailBody("");
+      setCallData({
+        date: new Date(),
+        duration: 0,
+        clientName: "",
+        company: "",
+        tags: []
+      });
+      
+      console.log("Tentative de chargement de l'analyse depuis localStorage");
+      const savedAnalysis = localStorage.getItem('callAnalysis');
+      
+      if (!savedAnalysis) {
+        console.error("Aucune analyse trouvée dans localStorage");
+        setLoadError("Aucune analyse d'appel trouvée. Veuillez enregistrer un appel d'abord.");
+        return;
       }
+      
+      console.log("Analyse trouvée:", savedAnalysis);
+      const analysis = JSON.parse(savedAnalysis) as AnalysisResult & {
+        clientName?: string;
+        duration?: number;
+        date?: string;
+      };
+      
+      console.log("Analyse parsée:", analysis);
+      
+      // Vérifier si l'analyse contient toutes les données nécessaires
+      if (!analysis.summary || !analysis.key_points || !analysis.tags || !analysis.follow_up_email) {
+        console.error("L'analyse ne contient pas toutes les données nécessaires");
+        setLoadError("L'analyse est incomplète. Veuillez réessayer l'enregistrement.");
+        return;
+      }
+      
+      setSummaryText(analysis.summary);
+      setKeyPoints(analysis.key_points);
+      setTags(analysis.tags);
+      setEmailSubject(analysis.follow_up_email.subject);
+      setEmailBody(analysis.follow_up_email.body);
+      
+      // Récupérer les metadata de l'appel
+      setCallData({
+        date: analysis.date ? new Date(analysis.date) : new Date(),
+        duration: analysis.duration || 0,
+        clientName: analysis.clientName || "Client",
+        company: "Entreprise", // Valeur par défaut
+        tags: analysis.tags
+      });
+      
+      setAnalysisLoaded(true);
+      setLoadError(null);
+    } catch (error) {
+      console.error('Erreur lors du chargement de l\'analyse:', error);
+      setLoadError(`Erreur lors du chargement de l'analyse: ${error.message}`);
     }
-  }, [id]);
+  }, [id]); // Ne pas retirer id ici, car on veut réagir aux changements de route
 
   const handleGoBack = () => {
     navigate(-1);
