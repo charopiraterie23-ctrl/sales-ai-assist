@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Upload, Circle, Square, Clock, Loader2, AlertTriangle } from 'lucide-react';
@@ -71,6 +70,7 @@ const RecordPage = () => {
       
       console.log('Analyse terminée avec succès', result);
       
+      // La navigation vers la page de résumé se fait seulement après que l'analyse est complétée
       navigate('/call-summary/new');
     } catch (error) {
       console.error("Erreur lors de l'analyse de l'appel:", error);

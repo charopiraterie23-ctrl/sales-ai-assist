@@ -80,6 +80,7 @@ export const analyzeCallTranscript = async (
       date: new Date().toISOString()
     };
     
+    console.log('Stockage de l\'analyse dans localStorage:', completeAnalysis);
     localStorage.setItem('callAnalysis', JSON.stringify(completeAnalysis));
     
     return data as AnalysisResult;

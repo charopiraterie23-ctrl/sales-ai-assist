@@ -59,38 +59,53 @@ const CallSummaryPage = () => {
       }
       
       console.log("Analyse trouvée:", savedAnalysis);
-      const analysis = JSON.parse(savedAnalysis) as AnalysisResult & {
-        clientName?: string;
-        duration?: number;
-        date?: string;
-      };
       
-      console.log("Analyse parsée:", analysis);
-      
-      // Vérifier si l'analyse contient toutes les données nécessaires
-      if (!analysis.summary || !analysis.key_points || !analysis.tags || !analysis.follow_up_email) {
-        console.error("L'analyse ne contient pas toutes les données nécessaires");
-        setLoadError("L'analyse est incomplète. Veuillez réessayer l'enregistrement.");
-        return;
+      try {
+        const analysis = JSON.parse(savedAnalysis) as AnalysisResult & {
+          clientName?: string;
+          duration?: number;
+          date?: string;
+        };
+        
+        console.log("Analyse parsée:", analysis);
+        
+        // Vérifier si l'analyse contient toutes les données nécessaires
+        if (!analysis.summary || !analysis.key_points || !analysis.tags || !analysis.follow_up_email) {
+          console.error("L'analyse ne contient pas toutes les données nécessaires", analysis);
+          setLoadError("L'analyse est incomplète. Veuillez réessayer l'enregistrement.");
+          return;
+        }
+        
+        // Définir tous les états avec les données de l'analyse
+        setSummaryText(analysis.summary);
+        setKeyPoints(analysis.key_points || []);
+        setTags(analysis.tags || []);
+        setEmailSubject(analysis.follow_up_email?.subject || "");
+        setEmailBody(analysis.follow_up_email?.body || "");
+        
+        // Récupérer les metadata de l'appel
+        setCallData({
+          date: analysis.date ? new Date(analysis.date) : new Date(),
+          duration: analysis.duration || 0,
+          clientName: analysis.clientName || "Client",
+          company: "Entreprise", // Valeur par défaut
+          tags: analysis.tags || []
+        });
+        
+        console.log("Données chargées avec succès:", {
+          summary: analysis.summary,
+          keyPoints: analysis.key_points,
+          emailSubject: analysis.follow_up_email?.subject,
+          clientName: analysis.clientName,
+          duration: analysis.duration
+        });
+        
+        setAnalysisLoaded(true);
+        setLoadError(null);
+      } catch (parseError) {
+        console.error('Erreur de parsing JSON:', parseError);
+        setLoadError(`Erreur de format JSON: ${parseError.message}`);
       }
-      
-      setSummaryText(analysis.summary);
-      setKeyPoints(analysis.key_points);
-      setTags(analysis.tags);
-      setEmailSubject(analysis.follow_up_email.subject);
-      setEmailBody(analysis.follow_up_email.body);
-      
-      // Récupérer les metadata de l'appel
-      setCallData({
-        date: analysis.date ? new Date(analysis.date) : new Date(),
-        duration: analysis.duration || 0,
-        clientName: analysis.clientName || "Client",
-        company: "Entreprise", // Valeur par défaut
-        tags: analysis.tags
-      });
-      
-      setAnalysisLoaded(true);
-      setLoadError(null);
     } catch (error) {
       console.error('Erreur lors du chargement de l\'analyse:', error);
       setLoadError(`Erreur lors du chargement de l'analyse: ${error.message}`);
