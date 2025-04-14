@@ -9,7 +9,219 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      calls: {
+        Row: {
+          audio_file: string
+          client_id: string | null
+          created_at: string
+          duration: number
+          id: string
+          language: string
+          source: Database["public"]["Enums"]["call_source"] | null
+          transcription: string | null
+          user_id: string
+        }
+        Insert: {
+          audio_file: string
+          client_id?: string | null
+          created_at?: string
+          duration: number
+          id?: string
+          language?: string
+          source?: Database["public"]["Enums"]["call_source"] | null
+          transcription?: string | null
+          user_id: string
+        }
+        Update: {
+          audio_file?: string
+          client_id?: string | null
+          created_at?: string
+          duration?: number
+          id?: string
+          language?: string
+          source?: Database["public"]["Enums"]["call_source"] | null
+          transcription?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calls_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          last_contacted: string | null
+          notes: string | null
+          phone: string | null
+          status: Database["public"]["Enums"]["client_status"] | null
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          last_contacted?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["client_status"] | null
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          last_contacted?: string | null
+          notes?: string | null
+          phone?: string | null
+          status?: Database["public"]["Enums"]["client_status"] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followup_emails: {
+        Row: {
+          body: string
+          id: string
+          is_customized: boolean | null
+          send_date: string | null
+          status: Database["public"]["Enums"]["email_status"] | null
+          subject: string
+          summary_id: string
+          to_email: string
+        }
+        Insert: {
+          body: string
+          id?: string
+          is_customized?: boolean | null
+          send_date?: string | null
+          status?: Database["public"]["Enums"]["email_status"] | null
+          subject: string
+          summary_id: string
+          to_email: string
+        }
+        Update: {
+          body?: string
+          id?: string
+          is_customized?: boolean | null
+          send_date?: string | null
+          status?: Database["public"]["Enums"]["email_status"] | null
+          subject?: string
+          summary_id?: string
+          to_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_emails_summary_id_fkey"
+            columns: ["summary_id"]
+            isOneToOne: false
+            referencedRelation: "summaries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          dark_mode: boolean
+          email_synced: boolean
+          full_name: string
+          id: string
+          lang: string
+          phone_number: string | null
+          plan: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          dark_mode?: boolean
+          email_synced?: boolean
+          full_name: string
+          id: string
+          lang?: string
+          phone_number?: string | null
+          plan?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          dark_mode?: boolean
+          email_synced?: boolean
+          full_name?: string
+          id?: string
+          lang?: string
+          phone_number?: string | null
+          plan?: string
+        }
+        Relationships: []
+      }
+      summaries: {
+        Row: {
+          call_id: string
+          generated_at: string
+          id: string
+          is_edited: boolean | null
+          summary_text: string
+          tags: string[] | null
+          tone: Database["public"]["Enums"]["summary_tone"] | null
+        }
+        Insert: {
+          call_id: string
+          generated_at?: string
+          id?: string
+          is_edited?: boolean | null
+          summary_text: string
+          tags?: string[] | null
+          tone?: Database["public"]["Enums"]["summary_tone"] | null
+        }
+        Update: {
+          call_id?: string
+          generated_at?: string
+          id?: string
+          is_edited?: boolean | null
+          summary_text?: string
+          tags?: string[] | null
+          tone?: Database["public"]["Enums"]["summary_tone"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "summaries_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +230,10 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      call_source: "upload" | "enregistrement"
+      client_status: "lead" | "intéressé" | "en attente" | "conclu" | "perdu"
+      email_status: "à envoyer" | "envoyé" | "échoué"
+      summary_tone: "formel" | "neutre" | "amical"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +348,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      call_source: ["upload", "enregistrement"],
+      client_status: ["lead", "intéressé", "en attente", "conclu", "perdu"],
+      email_status: ["à envoyer", "envoyé", "échoué"],
+      summary_tone: ["formel", "neutre", "amical"],
+    },
   },
 } as const

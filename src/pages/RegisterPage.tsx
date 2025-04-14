@@ -4,22 +4,22 @@ import { Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { AtSign, KeyRound, Github, Linkedin } from 'lucide-react';
+import { AtSign, KeyRound, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-const LoginPage = () => {
+const RegisterPage = () => {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const { signUp, user } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      await signIn(email, password);
+      await signUp(email, password, fullName);
     } finally {
       setIsLoading(false);
     }
@@ -40,10 +40,31 @@ const LoginPage = () => {
         </div>
 
         <div className="bg-white dark:bg-nexentry-blue-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 mb-4 animate-slide-up">
-          <h2 className="text-xl font-semibold mb-6">Connexion</h2>
+          <div className="flex items-center mb-6">
+            <Link to="/" className="text-gray-500 hover:text-nexentry-blue">
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <h2 className="text-xl font-semibold ml-4">Créer un compte</h2>
+          </div>
           
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleRegister}>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Nom complet</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="Jean Dupont"
+                    className="pl-10"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -61,12 +82,7 @@ const LoginPage = () => {
               </div>
               
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Link to="/reset-password" className="text-xs text-nexentry-blue hover:underline">
-                    Mot de passe oublié ?
-                  </Link>
-                </div>
+                <Label htmlFor="password">Mot de passe</Label>
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                   <Input
@@ -77,8 +93,12 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    minLength={6}
                   />
                 </div>
+                <p className="text-xs text-gray-500">
+                  Minimum 6 caractères
+                </p>
               </div>
               
               <Button 
@@ -86,41 +106,17 @@ const LoginPage = () => {
                 className="w-full bg-nexentry-blue hover:bg-nexentry-blue-dark"
                 disabled={isLoading}
               >
-                {isLoading ? 'Connexion...' : 'Se connecter'}
+                {isLoading ? 'Création...' : 'Créer mon compte'}
               </Button>
             </div>
           </form>
-          
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-nexentry-blue-dark px-2 text-gray-500 dark:text-gray-400">
-                  Ou continuer avec
-                </span>
-              </div>
-            </div>
-            
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" className="flex items-center justify-center gap-2" disabled>
-                <Github className="h-4 w-4" />
-                <span>GitHub</span>
-              </Button>
-              <Button variant="outline" className="flex items-center justify-center gap-2" disabled>
-                <Linkedin className="h-4 w-4" />
-                <span>LinkedIn</span>
-              </Button>
-            </div>
-          </div>
         </div>
         
         <div className="text-center animate-fade-in">
           <p className="text-gray-600 dark:text-gray-300 text-sm">
-            Nouveau sur nexentry ?{' '}
-            <Link to="/register" className="text-nexentry-blue font-medium hover:underline">
-              Créer un compte
+            Déjà inscrit ?{' '}
+            <Link to="/" className="text-nexentry-blue font-medium hover:underline">
+              Se connecter
             </Link>
           </p>
         </div>
@@ -129,4 +125,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
