@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Mic, Mail, Users, Send, Play, CheckCircle, Award, Users2 } from "lucide-react";
 import PricingCard from "@/components/pricing/PricingCard";
+import FeatureCard from "@/components/cards/FeatureCard";
+import StepCard from "@/components/cards/StepCard";
 
 const HomePage = () => {
   return (
@@ -229,34 +231,5 @@ const HomePage = () => {
     </div>
   );
 };
-
-// Helper Components
-const FeatureCard = ({ icon, title, description }: { 
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) => (
-  <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
-    <CardContent className="p-6">
-      <div className="mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </CardContent>
-  </Card>
-);
-
-const StepCard = ({ number, title, description }: {
-  number: string;
-  title: string;
-  description: string;
-}) => (
-  <div className="flex flex-col items-center text-center">
-    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg mb-4">
-      {number}
-    </div>
-    <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-    <p className="text-gray-600">{description}</p>
-  </div>
-);
 
 export default HomePage;
