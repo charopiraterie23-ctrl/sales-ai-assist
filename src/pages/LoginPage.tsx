@@ -33,7 +33,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex flex-col justify-center items-center px-4 bg-gray-50 dark:bg-gray-900">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-nexentry-blue-dark dark:text-white mb-2">nexentry.io</h1>
+          <h1 className="text-3xl font-bold text-nexentry-blue-dark dark:text-white mb-2">nexentry</h1>
           <p className="text-gray-600 dark:text-gray-300">
             Votre assistant commercial intelligent
           </p>
