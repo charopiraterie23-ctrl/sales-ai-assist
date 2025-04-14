@@ -16,6 +16,7 @@ import ClientDetailsPage from "./pages/ClientDetailsPage";
 import EditClientPage from "./pages/EditClientPage";
 import CallsPage from "./pages/CallsPage";
 import DashboardPage from "./pages/DashboardPage";
+import DailyActionsPage from "./pages/DailyActionsPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SettingsPage from "./pages/SettingsPage";
@@ -76,6 +77,11 @@ const App = () => (
             <Route path="/settings" element={
               <ProtectedRoute>
                 <SettingsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/daily-actions" element={
+              <ProtectedRoute>
+                <DailyActionsPage />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

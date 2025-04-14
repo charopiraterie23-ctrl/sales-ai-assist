@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface TodayOverviewCardProps {
   pendingCallsToday: number;
@@ -11,7 +12,7 @@ interface TodayOverviewCardProps {
 
 const TodayOverviewCard = ({ pendingCallsToday, readyEmails, clientsToFollowUp }: TodayOverviewCardProps) => {
   return (
-    <Card className="border-nexentry-blue border-l-4 animate-slide-up">
+    <Card className="animate-slide-up">
       <CardContent className="pt-6">
         <h3 className="text-lg font-semibold mb-3">Aujourd'hui</h3>
         <div className="grid grid-cols-3 gap-4 mb-4">
@@ -28,8 +29,10 @@ const TodayOverviewCard = ({ pendingCallsToday, readyEmails, clientsToFollowUp }
             <div className="text-xs text-gray-600">Clients à relancer</div>
           </div>
         </div>
-        <Button className="w-full bg-nexentry-blue hover:bg-nexentry-blue-dark">
-          <Calendar className="h-4 w-4 mr-2" /> Voir mes actions du jour
+        <Button className="w-full bg-nexentry-blue hover:bg-nexentry-blue-dark" asChild>
+          <Link to="/daily-actions">
+            <Calendar className="h-4 w-4 mr-2" /> Voir mes actions du jour
+          </Link>
         </Button>
       </CardContent>
     </Card>
