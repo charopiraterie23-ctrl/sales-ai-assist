@@ -1,25 +1,43 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Upload } from 'lucide-react';
+import { Mic, Upload, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
-const NewCallCard = () => {
+interface NewCallCardProps {
+  isLoading?: boolean;
+}
+
+const NewCallCard = ({ isLoading = false }: NewCallCardProps) => {
   const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
   
   return (
-    <Card className="animate-slide-up">
+    <Card 
+      className={`animate-slide-up ${isHovered ? 'shadow-md' : ''} transition-shadow duration-300`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <CardContent className="pt-6">
         <h3 className="text-lg font-semibold mb-4">Nouvel appel</h3>
         <Button 
-          className="w-full h-16 bg-nexentry-blue hover:bg-nexentry-blue-dark text-base gap-3"
+          className="w-full h-16 bg-nexentry-blue hover:bg-nexentry-blue-dark text-base gap-3 transition-all duration-300"
           onClick={() => navigate('/record')}
+          disabled={isLoading}
+          style={{ 
+            transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+          }}
         >
-          <div className="flex items-center gap-2">
-            <Mic className="h-5 w-5" />
-            <Upload className="h-5 w-5" />
-          </div>
-          Uploader ou enregistrer un appel
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <div className="flex items-center gap-2">
+              <Mic className="h-5 w-5" />
+              <Upload className="h-5 w-5" />
+            </div>
+          )}
+          {isLoading ? 'Chargement...' : 'Uploader ou enregistrer un appel'}
         </Button>
       </CardContent>
     </Card>
