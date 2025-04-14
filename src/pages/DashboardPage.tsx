@@ -102,21 +102,29 @@ const DashboardPage = () => {
             .rpc('get_calls_this_month', { user_uuid: user.id });
           
           if (callsError) throw callsError;
-          setCallsThisMonth(callsData as CallsThisMonth);
+          if (callsData) {
+            setCallsThisMonth(Array.isArray(callsData) && callsData.length > 0 
+              ? callsData[0] as CallsThisMonth 
+              : { total_calls: 0 });
+          }
           
           // 2. Récupérer les emails prêts à l'envoi
           const { data: emailsData, error: emailsError } = await supabase
             .rpc('get_emails_ready_to_send', { user_uuid: user.id });
           
           if (emailsError) throw emailsError;
-          setEmailsToSend(emailsData as EmailsToSend);
+          if (emailsData) {
+            setEmailsToSend(emailsData as EmailsToSend);
+          }
           
           // 3. Récupérer les appels à relancer aujourd'hui
           const { data: followUpData, error: followUpError } = await supabase
             .rpc('get_calls_to_follow_up_today', { user_uuid: user.id });
           
           if (followUpError) throw followUpError;
-          setCallsToFollow(followUpData as CallsToFollow);
+          if (followUpData) {
+            setCallsToFollow(followUpData as CallsToFollow);
+          }
           
         } catch (error) {
           console.error('Erreur lors du chargement des données du dashboard:', error);
@@ -195,7 +203,7 @@ const DashboardPage = () => {
         />
 
         {/* Alerte pour les appels à suivre */}
-        {callsToFollow && callsToFollow.calls.length > 0 && (
+        {callsToFollow && callsToFollow.calls && callsToFollow.calls.length > 0 && (
           <Alert variant="default" className="bg-orange-50 border-orange-200">
             <AlertCircle className="h-4 w-4 text-orange-500" />
             <AlertDescription className="flex justify-between items-center">
@@ -226,7 +234,7 @@ const DashboardPage = () => {
         )}
 
         {/* Alerte pour les emails prêts à l'envoi */}
-        {emailsToSend && emailsToSend.emails.length > 0 && (
+        {emailsToSend && emailsToSend.emails && emailsToSend.emails.length > 0 && (
           <Alert variant="default" className="bg-blue-50 border-blue-200">
             <Mail className="h-4 w-4 text-blue-500" />
             <AlertDescription className="flex justify-between items-center">
