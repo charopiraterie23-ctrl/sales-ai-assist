@@ -60,10 +60,10 @@ const faqItems: FAQItem[] = [
         <ul className="list-disc pl-5 space-y-1">
           <li>Toutes les données sont chiffrées en transit et au repos</li>
           <li>Nous ne partageons jamais vos données avec des tiers sans votre consentement explicite</li>
-          <li>Conformité totale avec le RGPD et autres réglementations sur la protection des données</li>
+          <li>Protection complète des données selon les normes internationales</li>
           <li>Possibilité de supprimer définitivement vos données à tout moment</li>
         </ul>
-        <p>Nos serveurs sont hébergés dans des centres de données sécurisés en Europe.</p>
+        <p>Notre infrastructure de sécurité est conçue pour protéger vos informations sensibles.</p>
       </div>
     ),
     icon: <Shield className="w-5 h-5 text-blue-500" />

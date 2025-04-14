@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { AtSign, KeyRound, Github, Linkedin } from 'lucide-react';
+import { AtSign, KeyRound } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const LoginPage = () => {
@@ -90,30 +90,6 @@ const LoginPage = () => {
               </Button>
             </div>
           </form>
-          
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white dark:bg-nexentry-blue-dark px-2 text-gray-500 dark:text-gray-400">
-                  Ou continuer avec
-                </span>
-              </div>
-            </div>
-            
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button variant="outline" className="flex items-center justify-center gap-2" disabled>
-                <Github className="h-4 w-4" />
-                <span>GitHub</span>
-              </Button>
-              <Button variant="outline" className="flex items-center justify-center gap-2" disabled>
-                <Linkedin className="h-4 w-4" />
-                <span>LinkedIn</span>
-              </Button>
-            </div>
-          </div>
         </div>
         
         <div className="text-center animate-fade-in">
