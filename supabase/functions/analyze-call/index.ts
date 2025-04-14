@@ -63,6 +63,8 @@ Réponds en français au format JSON avec la structure suivante:
 `;
 
     try {
+      console.log('Préparation de l\'appel à l\'API OpenAI');
+      
       // Appel à l'API OpenAI
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -80,6 +82,8 @@ Réponds en français au format JSON avec la structure suivante:
         }),
       });
 
+      console.log(`Statut de la réponse OpenAI: ${response.status}`);
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Erreur API OpenAI:', errorData);
@@ -91,9 +95,11 @@ Réponds en français au format JSON avec la structure suivante:
         if (errorData.error && errorData.error.code === 'insufficient_quota') {
           errorType = 'quota';
           errorMessage = 'Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI.';
+          console.error('ERREUR DE QUOTA: Les crédits OpenAI semblent insuffisants');
         } else if (errorData.error && errorData.error.code === 'invalid_api_key') {
           errorType = 'api_key';
           errorMessage = 'Clé API OpenAI invalide.';
+          console.error('ERREUR DE CLÉ API: La clé API OpenAI semble invalide');
         }
         
         return new Response(
@@ -111,11 +117,13 @@ Réponds en français au format JSON avec la structure suivante:
       
       // Extraire le contenu généré
       const content = data.choices[0].message.content;
+      console.log('Contenu généré:', content);
       
       // Analyser le contenu JSON
       let analysisResult;
       try {
         analysisResult = JSON.parse(content);
+        console.log('Analyse JSON réussie');
       } catch (e) {
         console.error('Erreur de parsing JSON:', e);
         
@@ -124,6 +132,7 @@ Réponds en français au format JSON avec la structure suivante:
         if (jsonMatch) {
           try {
             analysisResult = JSON.parse(jsonMatch[0]);
+            console.log('Analyse JSON de secours réussie');
           } catch (e2) {
             console.error('Deuxième tentative de parsing échouée:', e2);
             throw new Error('Format de réponse OpenAI non valide');
