@@ -45,7 +45,7 @@ const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => 
           <Button variant="ghost" size="icon" className="text-gray-500">
             <Bell size={20} />
           </Button>
-          <Link to="/profile">
+          <Link to="/settings">
             <Avatar className="h-8 w-8">
               <AvatarImage src="" alt="User" />
               <AvatarFallback className="bg-nexentry-blue text-white">

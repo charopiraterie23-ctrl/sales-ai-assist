@@ -17,7 +17,7 @@ import { useEmailConnection } from '@/hooks/useEmailConnection';
 import { toast } from '@/components/ui/sonner';
 
 const SettingsPage = () => {
-  const { user, profile, signOut, updateProfile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const { connectEmail, disconnectEmail, connectedAccounts } = useEmailConnection();
   const [aiTone, setAITone] = useState('professional');
   const [emailLanguage, setEmailLanguage] = useState('french');
@@ -48,7 +48,7 @@ const SettingsPage = () => {
       
       // Simulating an API call
       setTimeout(() => {
-        // In a real app, you would call updateProfile here
+        // In a real app, you would call an API to update profile here
         toast.success('Profil mis à jour avec succès');
         setIsLoading(false);
         setIsEditing(false);
