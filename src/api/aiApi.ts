@@ -32,6 +32,10 @@ export const analyzeCallTranscript = async (
         clientName,
         duration,
         context
+      },
+      // Augmenter le timeout pour les appels longs
+      options: {
+        timeout: 60000 // 60 secondes
       }
     });
 
@@ -46,7 +50,17 @@ export const analyzeCallTranscript = async (
       throw new Error("Aucune donnée reçue");
     }
     
-    console.log('Analyse reçue avec succès');
+    // Vérifier si la réponse contient une erreur
+    if (data.error) {
+      console.error('Erreur retournée par l\'API:', data);
+      throw { 
+        message: data.error,
+        errorType: data.errorType,
+        details: data.details
+      };
+    }
+    
+    console.log('Analyse reçue avec succès:', data);
     return data as AnalysisResult;
   } catch (error) {
     console.error('Erreur détaillée lors de l\'analyse de l\'appel:', error);
@@ -61,6 +75,12 @@ export const analyzeCallTranscript = async (
         toast.error("Clé API OpenAI invalide. Veuillez vérifier vos paramètres de configuration.");
       } else if (error.errorType === 'configuration') {
         toast.error("Configuration OpenAI manquante. Veuillez configurer votre clé API OpenAI.");
+      } else if (error.errorType === 'timeout') {
+        toast.error("La requête a pris trop de temps. Veuillez réessayer avec une transcription plus courte.");
+      } else if (error.errorType === 'rate_limit') {
+        toast.error("Limite de requêtes OpenAI atteinte. Veuillez attendre quelques minutes et réessayer.");
+      } else if (error.errorType === 'invalid_request') {
+        toast.error(`Erreur de requête: ${error.message}`);
       } else {
         toast.error(`Erreur lors de l'analyse de l'appel: ${error.message}`);
       }

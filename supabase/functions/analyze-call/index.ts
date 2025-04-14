@@ -34,6 +34,7 @@ serve(async (req) => {
     
     console.log(`Analyse d'un appel pour le client: ${clientName}, durée: ${duration}`);
     console.log(`Clé API OpenAI présente: ${openAIApiKey ? 'Oui' : 'Non'}`);
+    console.log(`Longueur de la clé API: ${openAIApiKey?.length || 0} caractères`);
     console.log(`Transcription reçue (longueur): ${transcript?.length || 0} caractères`);
     
     // Vérifier que les données essentielles sont présentes
@@ -80,7 +81,10 @@ Réponds en français au format JSON avec la structure suivante:
       console.log('Préparation de l\'appel à l\'API OpenAI');
       console.log('Modèle utilisé: gpt-4o-mini');
       
-      // Appel à l'API OpenAI
+      // Appel à l'API OpenAI avec un timeout plus long
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000); // 30 secondes de timeout
+      
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -95,10 +99,13 @@ Réponds en français au format JSON avec la structure suivante:
           ],
           temperature: 0.7,
         }),
+        signal: controller.signal
       });
-
+      
+      clearTimeout(timeout);
+      
       console.log(`Statut de la réponse OpenAI: ${response.status}`);
-
+      
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Erreur API OpenAI détaillée:', JSON.stringify(errorData));
@@ -107,17 +114,29 @@ Réponds en français au format JSON avec la structure suivante:
         let errorType = 'api';
         let errorMessage = 'Erreur lors de l\'appel à OpenAI';
         
-        if (errorData.error && errorData.error.code === 'insufficient_quota') {
-          errorType = 'quota';
-          errorMessage = 'Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI.';
-          console.error('ERREUR DE QUOTA: Les crédits OpenAI semblent insuffisants');
-        } else if (errorData.error && errorData.error.code === 'invalid_api_key') {
-          errorType = 'api_key';
-          errorMessage = 'Clé API OpenAI invalide.';
-          console.error('ERREUR DE CLÉ API: La clé API OpenAI semble invalide');
-        } else if (errorData.error && errorData.error.message) {
-          errorMessage = `Erreur OpenAI: ${errorData.error.message}`;
-          console.error(`ERREUR API: ${errorData.error.message}`);
+        if (errorData.error) {
+          console.error(`Code d'erreur OpenAI: ${errorData.error.code}, Type: ${errorData.error.type}`);
+          
+          if (errorData.error.code === 'insufficient_quota') {
+            errorType = 'quota';
+            errorMessage = 'Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI.';
+            console.error('ERREUR DE QUOTA: Les crédits OpenAI semblent insuffisants');
+          } else if (errorData.error.code === 'invalid_api_key') {
+            errorType = 'api_key';
+            errorMessage = 'Clé API OpenAI invalide.';
+            console.error('ERREUR DE CLÉ API: La clé API OpenAI semble invalide');
+          } else if (errorData.error.type === 'invalid_request_error') {
+            errorType = 'invalid_request';
+            errorMessage = `Requête invalide: ${errorData.error.message}`;
+            console.error(`ERREUR DE REQUÊTE: ${errorData.error.message}`);
+          } else if (errorData.error.type === 'rate_limit_exceeded') {
+            errorType = 'rate_limit';
+            errorMessage = 'Limite de débit dépassée. Veuillez réessayer dans quelques instants.';
+            console.error('ERREUR DE LIMITE DE DÉBIT: Trop de requêtes');
+          } else if (errorData.error.message) {
+            errorMessage = `Erreur OpenAI: ${errorData.error.message}`;
+            console.error(`ERREUR API: ${errorData.error.message}`);
+          }
         }
         
         return new Response(
@@ -173,6 +192,18 @@ Réponds en français au format JSON avec la structure suivante:
 
     } catch (apiError) {
       console.error('Erreur lors de l\'appel à l\'API OpenAI:', apiError);
+      
+      // Gérer les erreurs de timeout
+      if (apiError.name === 'AbortError') {
+        return new Response(
+          JSON.stringify({ 
+            error: 'La requête à OpenAI a expiré. Veuillez réessayer.', 
+            errorType: 'timeout' 
+          }),
+          { status: 408, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       return new Response(
         JSON.stringify({ 
           error: apiError.message, 

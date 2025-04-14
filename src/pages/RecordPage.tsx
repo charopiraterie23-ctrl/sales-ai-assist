@@ -1,7 +1,6 @@
-
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Upload, Circle, Square, Clock, Loader2 } from 'lucide-react';
+import { Mic, Upload, Circle, Square, Clock, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Layout from '@/components/layout/Layout';
 import { toast } from 'sonner';
@@ -16,9 +15,9 @@ const RecordPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientName, setClientName] = useState("Jean Dupont");
   const [context, setContext] = useState("Suivi d'implémentation CRM");
+  const [error, setError] = useState<string | null>(null);
+  const [retries, setRetries] = useState(0);
 
-  // Dans un vrai cas, cette transcription viendrait d'un service de transcription
-  // Pour cette démo, nous utilisons un script fictif
   const transcriptionRef = useRef("Bonjour Jean, merci de prendre le temps de discuter aujourd'hui. " +
     "Je voulais faire un suivi concernant notre dernière conversation sur l'implémentation du CRM. " +
     "Est-ce que votre équipe a eu le temps de consulter la documentation que je vous ai envoyée ? " +
@@ -29,11 +28,19 @@ const RecordPage = () => {
     "Je vais vous mettre en contact avec notre spécialiste migration qui pourra vous aider avec ce point spécifique. " +
     "Merci pour votre temps aujourd'hui, je vous envoie un récapitulatif par email.");
 
+  useEffect(() => {
+    return () => {
+      if (timer) {
+        clearInterval(timer);
+      }
+    };
+  }, [timer]);
+
   const startRecording = () => {
     setIsRecording(true);
     setRecordingTime(0);
+    setError(null);
     
-    // Start timer
     const intervalId = window.setInterval(() => {
       setRecordingTime(prev => prev + 1);
     }, 1000);
@@ -53,13 +60,12 @@ const RecordPage = () => {
     
     toast.success('Enregistrement terminé');
     
-    // Simuler la transcription
     setIsProcessing(true);
+    setError(null);
     
     try {
       console.log('Début de l\'analyse avec OpenAI...');
       
-      // Analyser la transcription avec l'API OpenAI
       const result = await analyzeCallTranscript(
         transcriptionRef.current,
         clientName,
@@ -69,7 +75,6 @@ const RecordPage = () => {
       
       console.log('Analyse terminée avec succès', result);
       
-      // Stocker les résultats dans le localStorage pour la démo
       localStorage.setItem('callAnalysis', JSON.stringify({
         ...result,
         clientName,
@@ -77,10 +82,10 @@ const RecordPage = () => {
         date: new Date().toISOString()
       }));
       
-      // Rediriger vers le résumé d'appel
       navigate('/call-summary/new');
     } catch (error) {
       console.error("Erreur lors de l'analyse de l'appel:", error);
+      setError(error.message || "Une erreur est survenue lors de l'analyse");
       setIsProcessing(false);
     }
   }, [navigate, recordingTime, timer, clientName, context]);
@@ -91,9 +96,9 @@ const RecordPage = () => {
     if (file) {
       toast.info(`Fichier "${file.name}" en cours de traitement...`);
       setIsProcessing(true);
+      setError(null);
       
       try {
-        // Pour cette démo, nous utilisons un script fictif pour le fichier également
         const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
           "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
           "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
@@ -111,7 +116,6 @@ const RecordPage = () => {
         try {
           console.log('Début de l\'analyse pour le fichier uploadé...');
           
-          // Analyser la transcription avec l'API OpenAI
           const result = await analyzeCallTranscript(
             mockTranscript,
             uploadClientName,
@@ -121,7 +125,6 @@ const RecordPage = () => {
           
           console.log('Analyse du fichier terminée avec succès', result);
           
-          // Stocker les résultats dans le localStorage pour la démo
           localStorage.setItem('callAnalysis', JSON.stringify({
             ...result,
             clientName: uploadClientName,
@@ -129,22 +132,54 @@ const RecordPage = () => {
             date: new Date().toISOString()
           }));
           
-          // Rediriger vers le résumé d'appel
           navigate('/call-summary/new');
         } catch (error) {
           console.error("Erreur lors de l'analyse du fichier:", error);
-          toast.error("Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.");
+          setError(error.message || "Une erreur est survenue lors de l'analyse");
           setIsProcessing(false);
         }
       } catch (error) {
         console.error("Erreur lors de l'analyse du fichier:", error);
-        toast.error("Erreur lors de l'analyse du fichier. Veuillez réessayer plus tard.");
+        setError(error.message || "Une erreur est survenue lors de l'analyse");
         setIsProcessing(false);
       }
     }
   };
 
-  // Format time as MM:SS
+  const handleRetry = () => {
+    setRetries(prev => prev + 1);
+    setError(null);
+    setIsProcessing(true);
+    
+    const transcript = transcriptionRef.current.substring(0, Math.max(100, transcriptionRef.current.length - 100 * retries));
+    
+    setTimeout(async () => {
+      try {
+        const result = await analyzeCallTranscript(
+          transcript,
+          clientName,
+          recordingTime,
+          context
+        );
+        
+        console.log('Nouvelle tentative d\'analyse réussie', result);
+        
+        localStorage.setItem('callAnalysis', JSON.stringify({
+          ...result,
+          clientName,
+          duration: recordingTime,
+          date: new Date().toISOString()
+        }));
+        
+        navigate('/call-summary/new');
+      } catch (error) {
+        console.error("Erreur lors de la nouvelle tentative:", error);
+        setError(error.message || "Une erreur est survenue lors de l'analyse");
+        setIsProcessing(false);
+      }
+    }, 1000);
+  };
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -157,12 +192,44 @@ const RecordPage = () => {
         {isProcessing ? (
           <div className="text-center">
             <div className="w-20 h-20 mx-auto mb-6">
-              <Loader2 className="w-full h-full text-nexentry-blue animate-spin" />
+              {error ? 
+                <AlertTriangle className="w-full h-full text-red-500" /> : 
+                <Loader2 className="w-full h-full text-nexentry-blue animate-spin" />
+              }
             </div>
-            <h3 className="text-xl font-medium mb-2">Analyse en cours</h3>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-              Notre IA analyse votre conversation pour générer un résumé et des suggestions...
-            </p>
+            
+            {error ? (
+              <>
+                <h3 className="text-xl font-medium mb-2 text-red-500">Erreur lors de l'analyse</h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-4">
+                  {error}
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setIsProcessing(false);
+                      setError(null);
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                  <Button 
+                    onClick={handleRetry}
+                    className="bg-nexentry-blue"
+                  >
+                    Réessayer
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-medium mb-2">Analyse en cours</h3>
+                <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                  Notre IA analyse votre conversation pour générer un résumé et des suggestions...
+                </p>
+              </>
+            )}
           </div>
         ) : isRecording ? (
           <div className="text-center">
