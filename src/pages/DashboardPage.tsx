@@ -114,7 +114,7 @@ const DashboardPage = () => {
           const { data: emailsData, error: emailsError } = await supabase
             .from('followup_emails')
             .select(`
-              id, to_email as to, subject, body, summary_id,
+              id, to_email, subject, body, summary_id,
               summaries!inner(call_id, calls!inner(user_id))
             `)
             .eq('status', 'à envoyer')
@@ -125,7 +125,7 @@ const DashboardPage = () => {
           // Formater les données pour correspondre à notre interface
           const formattedEmails: Email[] = emailsData ? emailsData.map(email => ({
             id: email.id,
-            to: email.to,
+            to: email.to_email, // Correction ici: utiliser le nom réel de la colonne
             subject: email.subject,
             body: email.body,
             summary_id: email.summary_id
