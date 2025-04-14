@@ -1,7 +1,6 @@
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
@@ -30,7 +29,34 @@ serve(async (req) => {
   }
 
   try {
-    const { transcript, clientName, duration, context } = await req.json();
+    // Vérifier si la clé OpenAI semble valide (longueur minimale)
+    if (openAIApiKey.length < 20) {
+      console.error('La clé API OpenAI semble invalide (trop courte)');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Clé API OpenAI invalide',
+          errorType: 'api_key'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    let requestData;
+    try {
+      requestData = await req.json();
+      console.log('Données de requête reçues ✓');
+    } catch (parseError) {
+      console.error('Erreur de parsing JSON de la requête:', parseError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Format de requête invalide', 
+          errorType: 'invalid_request' 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    const { transcript, clientName, duration, context } = requestData;
     
     console.log(`Analyse d'un appel pour le client: ${clientName}, durée: ${duration}`);
     console.log(`Clé API OpenAI présente: ${openAIApiKey ? 'Oui' : 'Non'}`);
@@ -43,6 +69,17 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Transcription manquante', 
+          errorType: 'data' 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (!clientName) {
+      console.error('Nom du client manquant');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Nom du client manquant', 
           errorType: 'data' 
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -81,10 +118,14 @@ Réponds en français au format JSON avec la structure suivante:
       console.log('Préparation de l\'appel à l\'API OpenAI');
       console.log('Modèle utilisé: gpt-4o-mini');
       
-      // Appel à l'API OpenAI avec un timeout plus long
+      // Appel à l'API OpenAI avec un timeout plus court
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 30000); // 30 secondes de timeout
+      const timeout = setTimeout(() => {
+        console.log('Timeout de la requête OpenAI déclenché');
+        controller.abort();
+      }, 25000); // 25 secondes de timeout - reduire pour éviter les timeouts côté client
       
+      console.log('Envoi de la requête à l\'API OpenAI');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -97,14 +138,14 @@ Réponds en français au format JSON avec la structure suivante:
             { role: 'system', content: 'Tu es un assistant spécialisé dans l\'analyse d\'appels commerciaux qui génère du contenu en français.' },
             { role: 'user', content: prompt }
           ],
-          temperature: 0.7,
+          temperature: 0.5, // Réduire légèrement la température pour des réponses plus consistantes
+          max_tokens: 800, // Limiter la longueur de la réponse pour améliorer la rapidité
         }),
         signal: controller.signal
       });
       
       clearTimeout(timeout);
-      
-      console.log(`Statut de la réponse OpenAI: ${response.status}`);
+      console.log(`Réponse de l'API OpenAI reçue avec statut: ${response.status}`);
       
       if (!response.ok) {
         const errorData = await response.json();
@@ -120,22 +161,17 @@ Réponds en français au format JSON avec la structure suivante:
           if (errorData.error.code === 'insufficient_quota') {
             errorType = 'quota';
             errorMessage = 'Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI.';
-            console.error('ERREUR DE QUOTA: Les crédits OpenAI semblent insuffisants');
           } else if (errorData.error.code === 'invalid_api_key') {
             errorType = 'api_key';
             errorMessage = 'Clé API OpenAI invalide.';
-            console.error('ERREUR DE CLÉ API: La clé API OpenAI semble invalide');
           } else if (errorData.error.type === 'invalid_request_error') {
             errorType = 'invalid_request';
             errorMessage = `Requête invalide: ${errorData.error.message}`;
-            console.error(`ERREUR DE REQUÊTE: ${errorData.error.message}`);
           } else if (errorData.error.type === 'rate_limit_exceeded') {
             errorType = 'rate_limit';
             errorMessage = 'Limite de débit dépassée. Veuillez réessayer dans quelques instants.';
-            console.error('ERREUR DE LIMITE DE DÉBIT: Trop de requêtes');
           } else if (errorData.error.message) {
             errorMessage = `Erreur OpenAI: ${errorData.error.message}`;
-            console.error(`ERREUR API: ${errorData.error.message}`);
           }
         }
         
@@ -150,7 +186,7 @@ Réponds en français au format JSON avec la structure suivante:
       }
 
       const data = await response.json();
-      console.log('Réponse d\'OpenAI reçue');
+      console.log('Réponse d\'OpenAI reçue et parsée avec succès');
       
       // Extraire le contenu généré
       const content = data.choices[0].message.content;
@@ -164,6 +200,7 @@ Réponds en français au format JSON avec la structure suivante:
         
         // Vérifier la structure du résultat
         if (!analysisResult.summary || !analysisResult.key_points || !analysisResult.tags || !analysisResult.follow_up_email) {
+          console.error('Structure JSON incomplète dans la réponse OpenAI');
           throw new Error('Structure JSON incomplète');
         }
       } catch (e) {
@@ -185,6 +222,7 @@ Réponds en français au format JSON avec la structure suivante:
       }
 
       // Retourner les résultats
+      console.log('Analyse terminée avec succès, envoi de la réponse');
       return new Response(
         JSON.stringify(analysisResult),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -197,7 +235,7 @@ Réponds en français au format JSON avec la structure suivante:
       if (apiError.name === 'AbortError') {
         return new Response(
           JSON.stringify({ 
-            error: 'La requête à OpenAI a expiré. Veuillez réessayer.', 
+            error: 'La requête à OpenAI a expiré. Veuillez réessayer avec une transcription plus courte.', 
             errorType: 'timeout' 
           }),
           { status: 408, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

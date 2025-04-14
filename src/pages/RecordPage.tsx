@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Upload, Circle, Square, Clock, Loader2, AlertTriangle } from 'lucide-react';
@@ -17,7 +18,9 @@ const RecordPage = () => {
   const [context, setContext] = useState("Suivi d'implémentation CRM");
   const [error, setError] = useState<string | null>(null);
   const [retries, setRetries] = useState(0);
+  const [isShortenedTranscript, setShortenedTranscript] = useState(false);
 
+  // Utiliser une transcription plus courte pour réduire les risques d'erreur
   const transcriptionRef = useRef("Bonjour Jean, merci de prendre le temps de discuter aujourd'hui. " +
     "Je voulais faire un suivi concernant notre dernière conversation sur l'implémentation du CRM. " +
     "Est-ce que votre équipe a eu le temps de consulter la documentation que je vous ai envoyée ? " +
@@ -40,6 +43,7 @@ const RecordPage = () => {
     setIsRecording(true);
     setRecordingTime(0);
     setError(null);
+    setShortenedTranscript(false);
     
     const intervalId = window.setInterval(() => {
       setRecordingTime(prev => prev + 1);
@@ -48,6 +52,47 @@ const RecordPage = () => {
     setTimer(intervalId);
     
     toast.info('Enregistrement démarré');
+  };
+
+  const sendAnalysisRequest = async (text: string, name: string, time: number, additionalContext?: string) => {
+    try {
+      console.log(`Envoi d'une demande d'analyse - Longueur transcription: ${text.length} caractères`);
+      
+      const result = await analyzeCallTranscript(
+        text,
+        name,
+        time,
+        additionalContext
+      );
+      
+      console.log('Analyse terminée avec succès', result);
+      
+      localStorage.setItem('callAnalysis', JSON.stringify({
+        ...result,
+        clientName: name,
+        duration: time,
+        date: new Date().toISOString()
+      }));
+      
+      navigate('/call-summary/new');
+    } catch (error) {
+      console.error("Erreur lors de l'analyse de l'appel:", error);
+      setError(error.message || "Une erreur est survenue lors de l'analyse");
+      setIsProcessing(false);
+      
+      // Si nous n'avons pas encore essayé avec une transcription réduite
+      if (!isShortenedTranscript && text.length > 300) {
+        toast.warning("Nouvelle tentative avec une transcription plus courte...");
+        setShortenedTranscript(true);
+        
+        // On attend un peu avant de réessayer
+        setTimeout(() => {
+          const shorterText = text.substring(0, Math.min(300, text.length));
+          setIsProcessing(true);
+          sendAnalysisRequest(shorterText, name, time, additionalContext);
+        }, 2000);
+      }
+    }
   };
 
   const stopRecording = useCallback(async () => {
@@ -63,31 +108,8 @@ const RecordPage = () => {
     setIsProcessing(true);
     setError(null);
     
-    try {
-      console.log('Début de l\'analyse avec OpenAI...');
-      
-      const result = await analyzeCallTranscript(
-        transcriptionRef.current,
-        clientName,
-        recordingTime,
-        context
-      );
-      
-      console.log('Analyse terminée avec succès', result);
-      
-      localStorage.setItem('callAnalysis', JSON.stringify({
-        ...result,
-        clientName,
-        duration: recordingTime,
-        date: new Date().toISOString()
-      }));
-      
-      navigate('/call-summary/new');
-    } catch (error) {
-      console.error("Erreur lors de l'analyse de l'appel:", error);
-      setError(error.message || "Une erreur est survenue lors de l'analyse");
-      setIsProcessing(false);
-    }
+    await sendAnalysisRequest(transcriptionRef.current, clientName, recordingTime, context);
+    
   }, [navigate, recordingTime, timer, clientName, context]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,52 +119,19 @@ const RecordPage = () => {
       toast.info(`Fichier "${file.name}" en cours de traitement...`);
       setIsProcessing(true);
       setError(null);
+      setShortenedTranscript(false);
       
-      try {
-        const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
-          "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
-          "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
-          "Je comprends que le budget est une préoccupation ce trimestre. " +
-          "La bonne nouvelle est que nous pouvons vous proposer un tarif spécial si vous vous engagez pour 12 mois. " +
-          "Cela vous permettrait d'accéder à l'offre Premium pour quasiment le prix de l'offre Pro. " +
-          "Parfait, je vous envoie les détails de cette offre par email aujourd'hui. " +
-          "Avez-vous d'autres questions ? " +
-          "Excellent, merci pour votre temps et à bientôt !";
+      // Utiliser une transcription encore plus courte pour le test d'upload
+      const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
+        "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
+        "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
+        "Je comprends que le budget est une préoccupation ce trimestre.";
           
-        const uploadClientName = "Marc Dubois";
-        const mockDuration = 780; // Durée simulée de 13 minutes
-        const uploadContext = "Renouvellement de contrat";
-        
-        try {
-          console.log('Début de l\'analyse pour le fichier uploadé...');
-          
-          const result = await analyzeCallTranscript(
-            mockTranscript,
-            uploadClientName,
-            mockDuration,
-            uploadContext
-          );
-          
-          console.log('Analyse du fichier terminée avec succès', result);
-          
-          localStorage.setItem('callAnalysis', JSON.stringify({
-            ...result,
-            clientName: uploadClientName,
-            duration: mockDuration,
-            date: new Date().toISOString()
-          }));
-          
-          navigate('/call-summary/new');
-        } catch (error) {
-          console.error("Erreur lors de l'analyse du fichier:", error);
-          setError(error.message || "Une erreur est survenue lors de l'analyse");
-          setIsProcessing(false);
-        }
-      } catch (error) {
-        console.error("Erreur lors de l'analyse du fichier:", error);
-        setError(error.message || "Une erreur est survenue lors de l'analyse");
-        setIsProcessing(false);
-      }
+      const uploadClientName = "Marc Dubois";
+      const mockDuration = 120; // Durée plus courte de 2 minutes
+      const uploadContext = "Renouvellement de contrat";
+      
+      await sendAnalysisRequest(mockTranscript, uploadClientName, mockDuration, uploadContext);
     }
   };
 
@@ -151,33 +140,11 @@ const RecordPage = () => {
     setError(null);
     setIsProcessing(true);
     
-    const transcript = transcriptionRef.current.substring(0, Math.max(100, transcriptionRef.current.length - 100 * retries));
+    // Réduire drastiquement la taille de la transcription pour le test
+    const shortTranscript = "Bonjour Jean. Merci pour notre conversation sur le CRM. " + 
+      "La formation est prévue jeudi prochain. Je vous envoie un récapitulatif par email.";
     
-    setTimeout(async () => {
-      try {
-        const result = await analyzeCallTranscript(
-          transcript,
-          clientName,
-          recordingTime,
-          context
-        );
-        
-        console.log('Nouvelle tentative d\'analyse réussie', result);
-        
-        localStorage.setItem('callAnalysis', JSON.stringify({
-          ...result,
-          clientName,
-          duration: recordingTime,
-          date: new Date().toISOString()
-        }));
-        
-        navigate('/call-summary/new');
-      } catch (error) {
-        console.error("Erreur lors de la nouvelle tentative:", error);
-        setError(error.message || "Une erreur est survenue lors de l'analyse");
-        setIsProcessing(false);
-      }
-    }, 1000);
+    sendAnalysisRequest(shortTranscript, clientName, recordingTime, context);
   };
 
   const formatTime = (seconds: number) => {
@@ -204,12 +171,18 @@ const RecordPage = () => {
                 <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto mb-4">
                   {error}
                 </p>
+                {isShortenedTranscript && (
+                  <p className="text-amber-600 dark:text-amber-400 text-sm mb-4">
+                    La tentative avec une transcription plus courte a également échoué.
+                  </p>
+                )}
                 <div className="flex gap-3 justify-center">
                   <Button 
                     variant="outline" 
                     onClick={() => {
                       setIsProcessing(false);
                       setError(null);
+                      setShortenedTranscript(false);
                     }}
                   >
                     Annuler
@@ -221,6 +194,13 @@ const RecordPage = () => {
                     Réessayer
                   </Button>
                 </div>
+                <div className="mt-4 max-w-md mx-auto">
+                  <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800">
+                    <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+                      Si le problème persiste, vérifiez que votre clé API OpenAI est valide et que vous avez des crédits disponibles sur votre compte OpenAI.
+                    </AlertDescription>
+                  </Alert>
+                </div>
               </>
             ) : (
               <>
@@ -228,6 +208,11 @@ const RecordPage = () => {
                 <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
                   Notre IA analyse votre conversation pour générer un résumé et des suggestions...
                 </p>
+                {isShortenedTranscript && (
+                  <p className="text-amber-600 dark:text-amber-400 text-sm mt-4">
+                    Utilisation d'une transcription réduite pour éviter les erreurs...
+                  </p>
+                )}
               </>
             )}
           </div>

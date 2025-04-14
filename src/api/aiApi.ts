@@ -26,16 +26,13 @@ export const analyzeCallTranscript = async (
       throw new Error("Transcription vide");
     }
     
+    // Note: Removing the options parameter that was causing the build error
     const { data, error } = await supabase.functions.invoke('analyze-call', {
       body: {
         transcript,
         clientName,
         duration,
         context
-      },
-      // Augmenter le timeout pour les appels longs
-      options: {
-        timeout: 60000 // 60 secondes
       }
     });
 
