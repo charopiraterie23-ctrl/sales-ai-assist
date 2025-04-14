@@ -124,7 +124,8 @@ export default {
 				'slide-up': 'slide-up 0.4s ease-out'
 			},
 			fontFamily: {
-				sans: ['Inter var', 'sans-serif']
+				sans: ['Montserrat', 'Inter var', 'sans-serif'],
+				montserrat: ['Montserrat', 'sans-serif']
 			}
 		}
 	},
