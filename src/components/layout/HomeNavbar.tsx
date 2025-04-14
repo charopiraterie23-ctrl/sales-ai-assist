@@ -1,8 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu, ArrowUpRight } from "lucide-react";
 
 const HomeNavbar = () => {
+  const isMobile = useIsMobile();
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-gray-100 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -22,11 +28,56 @@ const HomeNavbar = () => {
           </Link>
         </div>
         
-        <button className="md:hidden text-gray-700">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+        <div className="flex md:hidden items-center space-x-4">
+          <Link 
+            to="/login"
+            className="px-3 py-1.5 text-blue-600 border border-blue-600 rounded-full text-sm font-medium flex items-center"
+          >
+            <span>Essayer</span>
+            <ArrowUpRight className="ml-1 h-4 w-4" />
+          </Link>
+          
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <button className="text-gray-700">
+                <Menu className="w-6 h-6" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="pt-12">
+              <div className="flex flex-col space-y-4">
+                <a 
+                  href="#features" 
+                  className="text-gray-700 hover:text-blue-600 text-base font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Fonctionnalités
+                </a>
+                <a 
+                  href="#how-it-works" 
+                  className="text-gray-700 hover:text-blue-600 text-base font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Comment ça marche
+                </a>
+                <a 
+                  href="#pricing" 
+                  className="text-gray-700 hover:text-blue-600 text-base font-medium py-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Tarifs
+                </a>
+                <Link 
+                  to="/login"
+                  className="px-4 py-2 text-blue-600 border border-blue-600 rounded-full text-base font-medium transition-all inline-flex items-center justify-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span>Essayer maintenant</span>
+                  <ArrowUpRight className="ml-1 h-4 w-4" />
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </nav>
   );

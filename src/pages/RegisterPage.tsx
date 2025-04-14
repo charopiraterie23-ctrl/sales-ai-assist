@@ -1,11 +1,12 @@
 
 import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AtSign, KeyRound, User, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
 
 const RegisterPage = () => {
   const [fullName, setFullName] = useState('');
@@ -13,6 +14,7 @@ const RegisterPage = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signUp, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +22,16 @@ const RegisterPage = () => {
     
     try {
       await signUp(email, password, fullName);
+    } catch (error: any) {
+      // Vérifier si l'erreur est due à un utilisateur existant
+      if (error.message && (
+        error.message.includes('User already registered') || 
+        error.message.includes('already exists')
+      )) {
+        toast.info('Ce compte existe déjà. Redirection vers la page de connexion...');
+        setTimeout(() => navigate('/login'), 1500);
+        return;
+      }
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +128,7 @@ const RegisterPage = () => {
         <div className="text-center animate-fade-in">
           <p className="text-gray-600 dark:text-gray-300 text-sm">
             Déjà inscrit ?{' '}
-            <Link to="/" className="text-nexentry-blue font-medium hover:underline">
+            <Link to="/login" className="text-nexentry-blue font-medium hover:underline">
               Se connecter
             </Link>
           </p>
