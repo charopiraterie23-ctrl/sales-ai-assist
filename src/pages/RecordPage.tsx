@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Upload, Circle, Square, Clock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,20 @@ const RecordPage = () => {
   const [recordingTime, setRecordingTime] = useState(0);
   const [timer, setTimer] = useState<number | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [clientName, setClientName] = useState("Jean Dupont");
+  const [context, setContext] = useState("Suivi d'implémentation CRM");
+
+  // Dans un vrai cas, cette transcription viendrait d'un service de transcription
+  // Pour cette démo, nous utilisons un script fictif
+  const transcriptionRef = useRef("Bonjour Jean, merci de prendre le temps de discuter aujourd'hui. " +
+    "Je voulais faire un suivi concernant notre dernière conversation sur l'implémentation du CRM. " +
+    "Est-ce que votre équipe a eu le temps de consulter la documentation que je vous ai envoyée ? " +
+    "Super, je suis content d'entendre que c'était utile. Concernant la formation, nous pouvons organiser une session la semaine prochaine. " +
+    "Le jeudi 20 à 14h vous conviendrait ? Parfait, je vais réserver cette date. " +
+    "Avez-vous d'autres questions sur le processus d'implémentation ? " +
+    "Je comprends votre préoccupation concernant la migration des données. " +
+    "Je vais vous mettre en contact avec notre spécialiste migration qui pourra vous aider avec ce point spécifique. " +
+    "Merci pour votre temps aujourd'hui, je vous envoie un récapitulatif par email.");
 
   const startRecording = () => {
     setIsRecording(true);
@@ -44,33 +57,22 @@ const RecordPage = () => {
     setIsProcessing(true);
     
     try {
-      // Simulation de transcription (dans un vrai cas, vous recevriez ceci d'un service de transcription)
-      // Cet exemple utilise une transcription fictive pour démonstration
-      const mockTranscript = "Bonjour Jean, merci de prendre le temps de discuter aujourd'hui. " +
-        "Je voulais faire un suivi concernant notre dernière conversation sur l'implémentation du CRM. " +
-        "Est-ce que votre équipe a eu le temps de consulter la documentation que je vous ai envoyée ? " +
-        "Super, je suis content d'entendre que c'était utile. Concernant la formation, nous pouvons organiser une session la semaine prochaine. " +
-        "Le jeudi 20 à 14h vous conviendrait ? Parfait, je vais réserver cette date. " +
-        "Avez-vous d'autres questions sur le processus d'implémentation ? " +
-        "Je comprends votre préoccupation concernant la migration des données. " +
-        "Je vais vous mettre en contact avec notre spécialiste migration qui pourra vous aider avec ce point spécifique. " +
-        "Merci pour votre temps aujourd'hui, je vous envoie un récapitulatif par email.";
-      
-      setTranscript(mockTranscript);
+      console.log('Début de l\'analyse avec OpenAI...');
       
       // Analyser la transcription avec l'API OpenAI
       const result = await analyzeCallTranscript(
-        mockTranscript,
-        "Jean Dupont", // Dans un cas réel, ceci viendrait d'un sélecteur de client
+        transcriptionRef.current,
+        clientName,
         recordingTime,
-        "Suivi d'implémentation CRM"
+        context
       );
       
+      console.log('Analyse terminée avec succès', result);
+      
       // Stocker les résultats dans le localStorage pour la démo
-      // Dans un cas réel, vous les stockeriez dans votre base de données
       localStorage.setItem('callAnalysis', JSON.stringify({
         ...result,
-        clientName: "Jean Dupont",
+        clientName,
         duration: recordingTime,
         date: new Date().toISOString()
       }));
@@ -79,10 +81,9 @@ const RecordPage = () => {
       navigate('/call-summary/new');
     } catch (error) {
       console.error("Erreur lors de l'analyse de l'appel:", error);
-      toast.error("Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.");
       setIsProcessing(false);
     }
-  }, [navigate, recordingTime, timer]);
+  }, [navigate, recordingTime, timer, clientName, context]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -92,46 +93,49 @@ const RecordPage = () => {
       setIsProcessing(true);
       
       try {
-        // Simulation de transcription pour un fichier
-        // Dans un vrai cas, vous enverriez le fichier à un service de transcription
-        setTimeout(async () => {
-          const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
-            "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
-            "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
-            "Je comprends que le budget est une préoccupation ce trimestre. " +
-            "La bonne nouvelle est que nous pouvons vous proposer un tarif spécial si vous vous engagez pour 12 mois. " +
-            "Cela vous permettrait d'accéder à l'offre Premium pour quasiment le prix de l'offre Pro. " +
-            "Parfait, je vous envoie les détails de cette offre par email aujourd'hui. " +
-            "Avez-vous d'autres questions ? " +
-            "Excellent, merci pour votre temps et à bientôt !";
+        // Pour cette démo, nous utilisons un script fictif pour le fichier également
+        const mockTranscript = "Bonjour Marc, je vous appelle concernant le renouvellement de votre contrat. " +
+          "Comme nous en avions discuté précédemment, il arrive à échéance le mois prochain. " +
+          "Je voulais savoir si vous avez pris une décision concernant nos offres Pro et Premium ? " +
+          "Je comprends que le budget est une préoccupation ce trimestre. " +
+          "La bonne nouvelle est que nous pouvons vous proposer un tarif spécial si vous vous engagez pour 12 mois. " +
+          "Cela vous permettrait d'accéder à l'offre Premium pour quasiment le prix de l'offre Pro. " +
+          "Parfait, je vous envoie les détails de cette offre par email aujourd'hui. " +
+          "Avez-vous d'autres questions ? " +
+          "Excellent, merci pour votre temps et à bientôt !";
           
-          setTranscript(mockTranscript);
+        const uploadClientName = "Marc Dubois";
+        const mockDuration = 780; // Durée simulée de 13 minutes
+        const uploadContext = "Renouvellement de contrat";
+        
+        try {
+          console.log('Début de l\'analyse pour le fichier uploadé...');
           
-          try {
-            // Analyser la transcription avec l'API OpenAI
-            const result = await analyzeCallTranscript(
-              mockTranscript,
-              "Marc Dubois", // Dans un cas réel, ceci viendrait d'un sélecteur de client
-              780, // Durée simulée de 13 minutes
-              "Renouvellement de contrat"
-            );
-            
-            // Stocker les résultats dans le localStorage pour la démo
-            localStorage.setItem('callAnalysis', JSON.stringify({
-              ...result,
-              clientName: "Marc Dubois",
-              duration: 780,
-              date: new Date().toISOString()
-            }));
-            
-            // Rediriger vers le résumé d'appel
-            navigate('/call-summary/new');
-          } catch (error) {
-            console.error("Erreur lors de l'analyse du fichier:", error);
-            toast.error("Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.");
-            setIsProcessing(false);
-          }
-        }, 2000);
+          // Analyser la transcription avec l'API OpenAI
+          const result = await analyzeCallTranscript(
+            mockTranscript,
+            uploadClientName,
+            mockDuration,
+            uploadContext
+          );
+          
+          console.log('Analyse du fichier terminée avec succès', result);
+          
+          // Stocker les résultats dans le localStorage pour la démo
+          localStorage.setItem('callAnalysis', JSON.stringify({
+            ...result,
+            clientName: uploadClientName,
+            duration: mockDuration,
+            date: new Date().toISOString()
+          }));
+          
+          // Rediriger vers le résumé d'appel
+          navigate('/call-summary/new');
+        } catch (error) {
+          console.error("Erreur lors de l'analyse du fichier:", error);
+          toast.error("Une erreur est survenue lors de l'analyse. Veuillez réessayer plus tard.");
+          setIsProcessing(false);
+        }
       } catch (error) {
         console.error("Erreur lors de l'analyse du fichier:", error);
         toast.error("Erreur lors de l'analyse du fichier. Veuillez réessayer plus tard.");
@@ -234,7 +238,7 @@ const RecordPage = () => {
             
             <Alert className="mt-6 max-w-md mx-auto bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800">
               <AlertDescription className="text-blue-800 dark:text-blue-200">
-                Assurez-vous que votre clé API OpenAI est correctement configurée dans les paramètres du projet.
+                Assurez-vous que votre clé API OpenAI est correctement configurée dans les paramètres de votre compte.
               </AlertDescription>
             </Alert>
           </div>

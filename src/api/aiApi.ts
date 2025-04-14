@@ -19,6 +19,13 @@ export const analyzeCallTranscript = async (
   context?: string
 ): Promise<AnalysisResult> => {
   try {
+    console.log(`Envoi d'une demande d'analyse pour: ${clientName}, durée: ${duration}s`);
+    
+    if (!transcript || transcript.trim() === '') {
+      toast.error("La transcription est vide. Impossible d'analyser l'appel.");
+      throw new Error("Transcription vide");
+    }
+    
     const { data, error } = await supabase.functions.invoke('analyze-call', {
       body: {
         transcript,
@@ -28,15 +35,27 @@ export const analyzeCallTranscript = async (
       }
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erreur Supabase lors de l\'analyse:', error);
+      throw error;
+    }
     
+    if (!data) {
+      console.error('Aucune donnée reçue de la fonction analyze-call');
+      toast.error("Aucune donnée reçue de l'analyse. Veuillez réessayer.");
+      throw new Error("Aucune donnée reçue");
+    }
+    
+    console.log('Analyse reçue avec succès');
     return data as AnalysisResult;
   } catch (error) {
-    console.error('Erreur lors de l\'analyse de l\'appel:', error);
+    console.error('Erreur détaillée lors de l\'analyse de l\'appel:', error);
     
     // Amélioration de la gestion des erreurs avec des messages plus précis
-    if (error.message) {
-      if (error.message.includes('quota') || (error.details && error.details.error && error.details.error.code === 'insufficient_quota')) {
+    if (error.error && typeof error.error === 'string') {
+      toast.error(error.error);
+    } else if (error.message) {
+      if (error.errorType === 'quota' || (error.details && error.details.error && error.details.error.code === 'insufficient_quota')) {
         toast.error("Quota OpenAI dépassé. Veuillez vérifier votre plan de facturation OpenAI ou utiliser une nouvelle clé API.");
       } else if (error.errorType === 'api_key' || (error.details && error.details.error && error.details.error.code === 'invalid_api_key')) {
         toast.error("Clé API OpenAI invalide. Veuillez vérifier vos paramètres de configuration.");

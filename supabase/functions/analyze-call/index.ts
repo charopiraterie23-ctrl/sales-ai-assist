@@ -33,6 +33,20 @@ serve(async (req) => {
     const { transcript, clientName, duration, context } = await req.json();
     
     console.log(`Analyse d'un appel pour le client: ${clientName}, durée: ${duration}`);
+    console.log(`Clé API OpenAI présente: ${openAIApiKey ? 'Oui' : 'Non'}`);
+    console.log(`Transcription reçue (longueur): ${transcript?.length || 0} caractères`);
+    
+    // Vérifier que les données essentielles sont présentes
+    if (!transcript || transcript.trim() === '') {
+      console.error('Transcription manquante ou vide');
+      return new Response(
+        JSON.stringify({ 
+          error: 'Transcription manquante', 
+          errorType: 'data' 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     // Créer un prompt adapté pour l'analyse d'appel
     const prompt = `
@@ -64,6 +78,7 @@ Réponds en français au format JSON avec la structure suivante:
 
     try {
       console.log('Préparation de l\'appel à l\'API OpenAI');
+      console.log('Modèle utilisé: gpt-4o-mini');
       
       // Appel à l'API OpenAI
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -86,7 +101,7 @@ Réponds en français au format JSON avec la structure suivante:
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Erreur API OpenAI:', errorData);
+        console.error('Erreur API OpenAI détaillée:', JSON.stringify(errorData));
         
         // Identifier le type d'erreur spécifique
         let errorType = 'api';
@@ -100,6 +115,9 @@ Réponds en français au format JSON avec la structure suivante:
           errorType = 'api_key';
           errorMessage = 'Clé API OpenAI invalide.';
           console.error('ERREUR DE CLÉ API: La clé API OpenAI semble invalide');
+        } else if (errorData.error && errorData.error.message) {
+          errorMessage = `Erreur OpenAI: ${errorData.error.message}`;
+          console.error(`ERREUR API: ${errorData.error.message}`);
         }
         
         return new Response(
@@ -117,13 +135,18 @@ Réponds en français au format JSON avec la structure suivante:
       
       // Extraire le contenu généré
       const content = data.choices[0].message.content;
-      console.log('Contenu généré:', content);
+      console.log('Contenu généré (début):', content.substring(0, 100) + '...');
       
       // Analyser le contenu JSON
       let analysisResult;
       try {
         analysisResult = JSON.parse(content);
         console.log('Analyse JSON réussie');
+        
+        // Vérifier la structure du résultat
+        if (!analysisResult.summary || !analysisResult.key_points || !analysisResult.tags || !analysisResult.follow_up_email) {
+          throw new Error('Structure JSON incomplète');
+        }
       } catch (e) {
         console.error('Erreur de parsing JSON:', e);
         
