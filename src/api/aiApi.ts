@@ -27,12 +27,14 @@ export const analyzeCallTranscript = async (
     }
     
     // Stocker les métadonnées de l'appel dans localStorage
-    localStorage.setItem('callMetadata', JSON.stringify({
+    const callMetadata = {
       clientName,
       duration,
       company: 'Entreprise', // Valeur par défaut, à remplacer par une vraie valeur si disponible
       date: new Date().toISOString()
-    }));
+    };
+    
+    localStorage.setItem('callMetadata', JSON.stringify(callMetadata));
     
     const { data, error } = await supabase.functions.invoke('analyze-call', {
       body: {
@@ -66,8 +68,15 @@ export const analyzeCallTranscript = async (
     
     console.log('Analyse reçue avec succès:', data);
     
-    // Stocker les données d'analyse dans localStorage
-    localStorage.setItem('callAnalysis', JSON.stringify(data));
+    // Stocker les données d'analyse complètes dans localStorage (avec les métadonnées)
+    const completeAnalysis = {
+      ...data,
+      clientName,
+      duration,
+      date: new Date().toISOString()
+    };
+    
+    localStorage.setItem('callAnalysis', JSON.stringify(completeAnalysis));
     
     return data as AnalysisResult;
   } catch (error) {

@@ -23,6 +23,7 @@ const CallSummaryPage = () => {
   const [keyPoints, setKeyPoints] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [analysisLoaded, setAnalysisLoaded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [callData, setCallData] = useState({
     date: new Date(),
     duration: 0,
@@ -34,38 +35,70 @@ const CallSummaryPage = () => {
   // Chargement des données d'analyse depuis localStorage pour démo
   useEffect(() => {
     if (id === 'new') {
-      const savedAnalysis = localStorage.getItem('callAnalysis');
-      console.log("Trying to load analysis from localStorage:", savedAnalysis ? "Found" : "Not found");
-      
-      if (savedAnalysis) {
-        try {
-          const analysis = JSON.parse(savedAnalysis) as AnalysisResult;
-          console.log("Parsed analysis:", analysis);
-          
-          setSummaryText(analysis.summary);
-          setKeyPoints(analysis.key_points);
-          setTags(analysis.tags);
-          setEmailSubject(analysis.follow_up_email.subject);
-          setEmailBody(analysis.follow_up_email.body);
-          
-          // Récupérer les metadata de l'appel
-          const callMetadata = localStorage.getItem('callMetadata');
-          if (callMetadata) {
-            const metadata = JSON.parse(callMetadata);
-            setCallData({
-              date: new Date(),
-              duration: metadata.duration || 0,
-              clientName: metadata.clientName || "Client",
-              company: metadata.company || "Entreprise",
-              tags: analysis.tags
-            });
-          }
-          
-          setAnalysisLoaded(true);
-        } catch (error) {
-          console.error('Erreur lors du chargement de l\'analyse:', error);
-          toast.error('Erreur lors du chargement de l\'analyse');
+      try {
+        console.log("Tentative de chargement de l'analyse depuis localStorage");
+        const savedAnalysis = localStorage.getItem('callAnalysis');
+        
+        if (!savedAnalysis) {
+          console.error("Aucune analyse trouvée dans localStorage");
+          setLoadError("Aucune analyse d'appel trouvée. Veuillez enregistrer un appel d'abord.");
+          return;
         }
+        
+        console.log("Analyse trouvée:", savedAnalysis);
+        const analysis = JSON.parse(savedAnalysis) as AnalysisResult & {
+          clientName?: string;
+          duration?: number;
+          date?: string;
+        };
+        
+        console.log("Analyse parsée:", analysis);
+        
+        // Vérifier si l'analyse contient toutes les données nécessaires
+        if (!analysis.summary || !analysis.key_points || !analysis.tags || !analysis.follow_up_email) {
+          console.error("L'analyse ne contient pas toutes les données nécessaires");
+          setLoadError("L'analyse est incomplète. Veuillez réessayer l'enregistrement.");
+          return;
+        }
+        
+        setSummaryText(analysis.summary);
+        setKeyPoints(analysis.key_points);
+        setTags(analysis.tags);
+        setEmailSubject(analysis.follow_up_email.subject);
+        setEmailBody(analysis.follow_up_email.body);
+        
+        // Récupérer les metadata de l'appel
+        let callMetadata;
+        if (analysis.clientName && analysis.duration) {
+          // Si les métadonnées sont incluses dans l'analyse
+          callMetadata = {
+            clientName: analysis.clientName,
+            duration: analysis.duration,
+            date: analysis.date ? new Date(analysis.date) : new Date(),
+            company: "Entreprise" // Valeur par défaut
+          };
+        } else {
+          // Sinon, essayer de les obtenir séparément
+          const metadataStr = localStorage.getItem('callMetadata');
+          if (metadataStr) {
+            callMetadata = JSON.parse(metadataStr);
+          }
+        }
+        
+        if (callMetadata) {
+          setCallData({
+            date: new Date(callMetadata.date || new Date()),
+            duration: callMetadata.duration || 0,
+            clientName: callMetadata.clientName || "Client",
+            company: callMetadata.company || "Entreprise",
+            tags: analysis.tags
+          });
+        }
+        
+        setAnalysisLoaded(true);
+      } catch (error) {
+        console.error('Erreur lors du chargement de l\'analyse:', error);
+        setLoadError(`Erreur lors du chargement de l'analyse: ${error.message}`);
       }
     }
   }, [id]);
@@ -77,6 +110,14 @@ const CallSummaryPage = () => {
   const handleSaveSummary = () => {
     setIsEditing(false);
     toast.success("Résumé enregistré");
+    
+    // Mettre à jour dans localStorage
+    const savedAnalysis = localStorage.getItem('callAnalysis');
+    if (savedAnalysis) {
+      const analysis = JSON.parse(savedAnalysis);
+      analysis.summary = summaryText;
+      localStorage.setItem('callAnalysis', JSON.stringify(analysis));
+    }
   };
 
   const handleCopySummary = () => {
@@ -89,6 +130,47 @@ const CallSummaryPage = () => {
     navigate("/calls");
   };
 
+  if (loadError) {
+    return (
+      <Layout 
+        title="Résumé d'appel" 
+        showBackButton={true}
+        onBackClick={handleGoBack}
+      >
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="text-red-500 mb-4">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="48" 
+              height="48" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+          </div>
+          <h3 className="text-xl font-medium mb-2">Erreur de chargement</h3>
+          <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
+            {loadError}
+          </p>
+          <Button 
+            variant="outline" 
+            className="mt-6"
+            onClick={() => navigate('/record')}
+          >
+            Enregistrer un nouvel appel
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout 
       title="Résumé d'appel" 
@@ -99,10 +181,10 @@ const CallSummaryPage = () => {
         <div className="nexentry-card">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="text-xl font-semibold">{callData.clientName}</h2>
+              <h2 className="text-xl font-semibold">{callData.clientName || "Client"}</h2>
               <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-1">
                 <Building size={14} className="mr-1" />
-                {callData.company}
+                {callData.company || "Entreprise"}
               </div>
             </div>
             <Button 
