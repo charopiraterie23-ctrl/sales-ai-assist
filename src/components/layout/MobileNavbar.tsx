@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Mic, Users, Phone, Clock, Settings } from 'lucide-react';
+import { Mic, Users, Phone, Home, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MobileNavbar = () => {
@@ -9,6 +9,11 @@ const MobileNavbar = () => {
   const [activeTab, setActiveTab] = useState(location.pathname);
 
   const navItems = [
+    {
+      path: '/dashboard',
+      label: 'Accueil',
+      icon: <Home size={20} />,
+    },
     {
       path: '/record',
       label: 'Enregistrer',
@@ -23,11 +28,6 @@ const MobileNavbar = () => {
       path: '/calls',
       label: 'Appels',
       icon: <Phone size={20} />,
-    },
-    {
-      path: '/history',
-      label: 'Historique',
-      icon: <Clock size={20} />,
     },
     {
       path: '/settings',

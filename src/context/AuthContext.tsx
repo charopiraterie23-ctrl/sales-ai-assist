@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      navigate('/calls');
+      navigate('/dashboard');
     } catch (error: any) {
       toast({
         title: 'Erreur',

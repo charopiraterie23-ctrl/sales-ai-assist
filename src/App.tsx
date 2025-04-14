@@ -12,6 +12,7 @@ import RecordPage from "./pages/RecordPage";
 import CallSummaryPage from "./pages/CallSummaryPage";
 import ClientsPage from "./pages/ClientsPage";
 import CallsPage from "./pages/CallsPage";
+import DashboardPage from "./pages/DashboardPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
@@ -28,6 +29,11 @@ const App = () => (
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            } />
             <Route path="/record" element={
               <ProtectedRoute>
                 <RecordPage />
