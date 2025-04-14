@@ -20,7 +20,7 @@ const DailyActionsPage = () => {
     title: `Appel client à suivre`,
     date: new Date(call.created_at).toLocaleDateString('fr-FR'),
     completed: false,
-    type: 'call',
+    type: 'call' as const,
     clientId: call.client_id
   })) || [];
   
@@ -29,7 +29,7 @@ const DailyActionsPage = () => {
     title: `Email à envoyer: ${email.subject}`,
     to: email.to,
     completed: false,
-    type: 'email',
+    type: 'email' as const,
     summaryId: email.summary_id
   })) || [];
   
