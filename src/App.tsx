@@ -11,6 +11,7 @@ import RegisterPage from "./pages/RegisterPage";
 import RecordPage from "./pages/RecordPage";
 import CallSummaryPage from "./pages/CallSummaryPage";
 import ClientsPage from "./pages/ClientsPage";
+import ClientDetailsPage from "./pages/ClientDetailsPage";
 import CallsPage from "./pages/CallsPage";
 import DashboardPage from "./pages/DashboardPage";
 import NotFound from "./pages/NotFound";
@@ -47,6 +48,11 @@ const App = () => (
             <Route path="/clients" element={
               <ProtectedRoute>
                 <ClientsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/client/:id" element={
+              <ProtectedRoute>
+                <ClientDetailsPage />
               </ProtectedRoute>
             } />
             <Route path="/calls" element={

@@ -15,7 +15,7 @@ const NewCallCard = ({ isLoading = false }: NewCallCardProps) => {
   
   return (
     <Card 
-      className={`animate-slide-up ${isHovered ? 'shadow-md' : ''} transition-shadow duration-300`}
+      className={`animate-slide-up ${isHovered ? 'shadow-md' : ''} transition-all duration-300`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -26,18 +26,23 @@ const NewCallCard = ({ isLoading = false }: NewCallCardProps) => {
           onClick={() => navigate('/record')}
           disabled={isLoading}
           style={{ 
-            transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+            transform: isHovered && !isLoading ? 'translateY(-2px)' : 'translateY(0)',
           }}
         >
           {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Chargement...</span>
+            </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Mic className="h-5 w-5" />
-              <Upload className="h-5 w-5" />
+              <div className="flex items-center gap-2 animate-fade-in">
+                <Mic className="h-5 w-5" />
+                <Upload className="h-5 w-5" />
+              </div>
+              <span>Uploader ou enregistrer un appel</span>
             </div>
           )}
-          {isLoading ? 'Chargement...' : 'Uploader ou enregistrer un appel'}
         </Button>
       </CardContent>
     </Card>
