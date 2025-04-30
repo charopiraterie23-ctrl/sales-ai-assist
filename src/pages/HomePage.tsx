@@ -1,5 +1,6 @@
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import HomeNavbar from "@/components/layout/HomeNavbar";
 import HeroSection from "@/components/sections/HeroSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
@@ -11,7 +12,15 @@ import HomeFooter from "@/components/layout/HomeFooter";
 import { useAuth } from '@/context/AuthContext';
 
 const HomePage = () => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-nexentry-blue"></div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
