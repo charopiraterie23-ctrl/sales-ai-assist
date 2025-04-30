@@ -26,7 +26,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 243 75% 70%;
+    --accent: 213 75% 70%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -67,7 +67,7 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 243 75% 70%;
+    --accent: 213 75% 70%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -120,7 +120,7 @@
   }
   
   .nexentry-button-primary {
-    @apply bg-gradient-to-r from-nexentry-purple to-nexentry-purple-vivid hover:from-nexentry-purple-vivid hover:to-nexentry-purple text-white rounded-xl px-5 py-2.5 font-medium transition-all duration-300 shadow-sm hover:shadow-md;
+    @apply bg-gradient-to-r from-nexentry-blue to-nexentry-blue-vivid hover:from-nexentry-blue-vivid hover:to-nexentry-blue text-white rounded-xl px-5 py-2.5 font-medium transition-all duration-300 shadow-sm hover:shadow-md;
   }
   
   .nexentry-button-secondary {
@@ -128,7 +128,7 @@
   }
   
   .nexentry-input {
-    @apply w-full rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:border-nexentry-purple focus:ring-2 focus:ring-nexentry-purple/20 transition-all duration-200;
+    @apply w-full rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:border-nexentry-blue focus:ring-2 focus:ring-nexentry-blue/20 transition-all duration-200;
   }
   
   .glass-card {
@@ -136,7 +136,7 @@
   }
   
   .gradient-text {
-    @apply bg-gradient-to-r from-nexentry-purple-vivid to-nexentry-blue-light bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-nexentry-blue-vivid to-nexentry-blue-light bg-clip-text text-transparent;
   }
 }
 

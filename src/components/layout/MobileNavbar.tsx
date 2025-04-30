@@ -70,8 +70,8 @@ const MobileNavbar = () => {
                 className={cn(
                   'flex flex-col items-center justify-center py-2 px-3 rounded-xl font-medium transition-all duration-300',
                   activeTab === item.path
-                    ? 'text-white dark:text-white bg-gradient-to-br from-nexentry-purple to-nexentry-purple-vivid shadow-md'
-                    : 'text-gray-500 dark:text-gray-400 hover:text-nexentry-purple dark:hover:text-nexentry-purple-light'
+                    ? 'text-white dark:text-white bg-gradient-to-br from-nexentry-blue to-nexentry-blue-vivid shadow-md'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-nexentry-blue dark:hover:text-nexentry-blue-light'
                 )}
                 onClick={() => setActiveTab(item.path)}
               >
@@ -99,7 +99,7 @@ const MobileNavbar = () => {
             <motion.div
               whileTap={{ scale: 0.9 }}
               whileHover={{ scale: 1.1, y: -2 }}
-              className="bg-gradient-to-r from-nexentry-purple to-nexentry-purple-vivid text-white p-3 rounded-full shadow-lg"
+              className="bg-gradient-to-r from-nexentry-blue to-nexentry-blue-vivid text-white p-3 rounded-full shadow-lg"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <ChevronUp size={20} />

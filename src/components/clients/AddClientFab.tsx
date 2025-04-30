@@ -9,10 +9,10 @@ const AddClientFab = () => {
   return (
     <motion.button
       onClick={() => navigate('/clients/add')}
-      className="fixed right-6 bottom-[84px] w-14 h-14 rounded-full bg-gradient-to-br from-nexentry-purple to-nexentry-purple-vivid text-white flex items-center justify-center shadow-lg z-50"
+      className="fixed right-6 bottom-[84px] w-14 h-14 rounded-full bg-gradient-to-br from-nexentry-blue to-nexentry-blue-vivid text-white flex items-center justify-center shadow-lg z-50"
       whileHover={{ 
         scale: 1.1,
-        boxShadow: "0 20px 25px -5px rgba(155, 135, 245, 0.4), 0 10px 10px -5px rgba(155, 135, 245, 0.3)"
+        boxShadow: "0 20px 25px -5px rgba(37, 99, 235, 0.4), 0 10px 10px -5px rgba(37, 99, 235, 0.3)"
       }}
       whileTap={{ scale: 0.95 }}
       initial={{ y: 100, opacity: 0 }}

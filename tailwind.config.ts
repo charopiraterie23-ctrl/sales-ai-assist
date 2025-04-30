@@ -76,10 +76,10 @@ export default {
 						dark: '#334155'
 					},
 					purple: {
-						light: '#D6BCFA',
-						DEFAULT: '#9b87f5',
-						dark: '#7E69AB',
-						vivid: '#8B5CF6'
+						light: '#3B82F6',
+						DEFAULT: '#2563EB',
+						dark: '#1D4ED8',
+						vivid: '#1E40AF'
 					},
 					orange: {
 						DEFAULT: '#F97316'

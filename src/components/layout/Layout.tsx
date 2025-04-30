@@ -50,9 +50,9 @@ const Layout = ({
             <TooltipTrigger asChild>
               <motion.button 
                 aria-label="Nouveau résumé"
-                className="fixed bottom-[84px] right-6 w-16 h-16 rounded-full shadow-lg bg-gradient-to-br from-nexentry-purple to-nexentry-purple-vivid text-white z-40 flex items-center justify-center"
+                className="fixed bottom-[84px] right-6 w-16 h-16 rounded-full shadow-lg bg-gradient-to-br from-nexentry-blue to-nexentry-blue-vivid text-white z-40 flex items-center justify-center"
                 onClick={() => window.location.href = '/record'}
-                whileHover={{ scale: 1.08, boxShadow: "0 15px 30px rgba(155, 135, 245, 0.3)" }}
+                whileHover={{ scale: 1.08, boxShadow: "0 15px 30px rgba(37, 99, 235, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -64,7 +64,7 @@ const Layout = ({
                 </svg>
               </motion.button>
             </TooltipTrigger>
-            <TooltipContent side="left" className="bg-nexentry-purple text-white border-none shadow-lg">
+            <TooltipContent side="left" className="bg-nexentry-blue text-white border-none shadow-lg">
               <p>Nouveau résumé</p>
             </TooltipContent>
           </Tooltip>

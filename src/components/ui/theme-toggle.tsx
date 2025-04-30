@@ -32,7 +32,7 @@ export function ThemeToggle({ className, variant = "ghost", size = "icon" }: The
         {theme === "dark" ? (
           <Sun className="h-5 w-5 text-yellow-400" />
         ) : (
-          <Moon className="h-5 w-5 text-nexentry-purple" />
+          <Moon className="h-5 w-5 text-nexentry-blue" />
         )}
       </motion.div>
       <span className="sr-only">Toggle theme</span>
