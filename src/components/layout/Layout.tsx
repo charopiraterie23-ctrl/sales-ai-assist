@@ -12,7 +12,6 @@ interface LayoutProps {
   onBackClick?: () => void;
   showNavbar?: boolean;
   showFAB?: boolean;
-  className?: string;
 }
 
 const Layout = ({ 
@@ -21,16 +20,15 @@ const Layout = ({
   showBackButton = false, 
   onBackClick, 
   showNavbar = true,
-  showFAB = false,
-  className = ""
+  showFAB = false
 }: LayoutProps) => {
   return (
-    <div className={`flex flex-col min-h-screen bg-gradient-to-br from-gray-950 to-gray-900 dark:from-gray-950 dark:to-gray-900 ${className}`}>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-900">
       <Header 
         title={title} 
         showBackButton={showBackButton} 
         onBackClick={onBackClick} 
-        className="sticky top-0 z-20"
+        className="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl"
       />
       
       <motion.main 

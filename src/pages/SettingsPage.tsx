@@ -1,6 +1,7 @@
 
 import React, { useState, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
+import { User } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useEmailConnection } from '@/hooks/email/useEmailConnection';
 import { toast } from '@/components/ui/sonner';
@@ -85,8 +86,8 @@ const SettingsPage = () => {
   if (!user || !profile) return null;
 
   return (
-    <Layout title="Paramètres" className="bg-gray-950 text-white">
-      <div className="space-y-6 max-w-2xl mx-auto py-4">
+    <Layout title="Paramètres">
+      <div className="space-y-8 max-w-2xl mx-auto">
         <ProfileSection 
           profile={profile}
           isEditing={isEditing}
