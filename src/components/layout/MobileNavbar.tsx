@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Mic, Users, Phone, Home, Settings } from 'lucide-react';
+import { Home, Users, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MobileNavbar = () => {
@@ -15,30 +15,20 @@ const MobileNavbar = () => {
       icon: <Home size={20} />,
     },
     {
-      path: '/record',
-      label: 'Nouveau',
-      icon: <Mic size={20} />,
-    },
-    {
       path: '/clients',
       label: 'Contacts',
       icon: <Users size={20} />,
     },
     {
       path: '/calls',
-      label: 'Résumés',
-      icon: <Phone size={20} />,
-    },
-    {
-      path: '/settings',
-      label: 'Paramètres',
-      icon: <Settings size={20} />,
+      label: 'Sessions',
+      icon: <FileText size={20} />,
     },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-nexentry-blue-dark border-t border-gray-200 dark:border-gray-800 px-2 pb-1 pt-2 z-50">
-      <div className="grid grid-cols-5 gap-1">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#111827] border-t border-gray-200 dark:border-gray-800 px-6 py-3 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
+      <div className="grid grid-cols-3 gap-1">
         {navItems.map((item) => (
           <Link
             key={item.path}
@@ -46,8 +36,8 @@ const MobileNavbar = () => {
             className={cn(
               'flex flex-col items-center justify-center py-1 px-3 rounded-lg text-xs font-medium transition-colors',
               activeTab === item.path
-                ? 'text-nexentry-blue dark:text-white'
-                : 'text-gray-500 dark:text-gray-400 hover:text-nexentry-blue dark:hover:text-white'
+                ? 'text-[#2166F0] dark:text-white'
+                : 'text-[#6B7280] dark:text-gray-400 hover:text-[#2166F0] dark:hover:text-white'
             )}
             onClick={() => setActiveTab(item.path)}
           >

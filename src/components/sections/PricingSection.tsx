@@ -14,8 +14,8 @@ const PricingSection = () => {
     <section id="pricing" className="py-16 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Des plans adaptés à vos besoins</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">Testez gratuitement. Passez à Pro quand vous êtes prêt.</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#111827] mb-4">Des plans adaptés à vos besoins</h2>
+          <p className="text-lg text-[#6B7280] max-w-2xl mx-auto">Testez gratuitement. Passez à Pro quand vous êtes prêt.</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
