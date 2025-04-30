@@ -1,21 +1,11 @@
 
 import { motion } from 'framer-motion';
 import ClientCard from '@/components/cards/ClientCard';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface Client {
-  id: string;
-  fullName: string;
-  company?: string;
-  email?: string;
-  phone?: string;
-  lastContacted?: Date;
-  status: 'lead' | 'intéressé' | 'en attente' | 'conclu' | 'perdu';
-}
+import { ClientType } from '@/types/client';
 
 interface ClientListProps {
-  clients: Client[];
+  clients: ClientType[];
   onSwipeLeft?: (clientId: string) => void;
   onSwipeRight?: (clientId: string) => void;
 }
@@ -50,18 +40,18 @@ const ClientList = ({ clients, onSwipeLeft, onSwipeRight }: ClientListProps) => 
       className="space-y-2"
     >
       {clients.map((client) => (
-        <motion.div key={client.id} variants={item} layout>
+        <motion.div key={client.clientId} variants={item} layout>
           <ClientCard
-            clientId={client.id}
+            clientId={client.clientId}
             fullName={client.fullName}
             company={client.company}
             email={client.email}
             phone={client.phone}
             lastContacted={client.lastContacted}
             status={client.status}
-            onClick={() => handleClientClick(client.id)}
-            onSwipeLeft={() => onSwipeLeft && onSwipeLeft(client.id)}
-            onSwipeRight={() => onSwipeRight && onSwipeRight(client.id)}
+            onClick={() => handleClientClick(client.clientId)}
+            onSwipeLeft={() => onSwipeLeft && onSwipeLeft(client.clientId)}
+            onSwipeRight={() => onSwipeRight && onSwipeRight(client.clientId)}
           />
         </motion.div>
       ))}
