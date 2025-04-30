@@ -4,11 +4,13 @@ import Layout from '@/components/layout/Layout';
 import ClientSearch from '@/components/clients/ClientSearch';
 import ClientFilters from '@/components/clients/ClientFilters';
 import ClientSortingOptions from '@/components/clients/ClientSortingOptions';
-import ClientList from '@/components/clients/ClientList';
+import VirtualizedClientList from '@/components/clients/VirtualizedClientList';
 import ClientEmptyState from '@/components/clients/ClientEmptyState';
 import LoadingSkeleton from '@/components/clients/LoadingSkeleton';
 import AddClientFab from '@/components/clients/AddClientFab';
+import AdvancedFilterSheet from '@/components/clients/AdvancedFilterSheet';
 import { useClientData } from '@/hooks/useClientData';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -25,7 +27,16 @@ const ClientsPage = () => {
     totalPages,
     handlePageChange,
     handleSort,
+    advancedFilters,
+    handleAdvancedFilters,
+    isFilterSheetOpen,
+    setIsFilterSheetOpen,
+    hasActiveAdvancedFilters
   } = useClientData();
+
+  const handleOpenFilterSheet = () => {
+    setIsFilterSheetOpen(true);
+  };
 
   return (
     <Layout title="Clients" showFAB={false}>
@@ -45,31 +56,56 @@ const ClientsPage = () => {
           <ClientSortingOptions 
             sortType={sortType} 
             sortDirection={sortDirection} 
-            handleSort={handleSort} 
+            handleSort={handleSort}
+            onOpenFilters={handleOpenFilterSheet}
+            hasActiveFilters={hasActiveAdvancedFilters}
           />
         </div>
         
-        {isLoading ? (
-          <LoadingSkeleton />
-        ) : (
-          <div>
-            {paginatedClients.length > 0 ? (
-              <ClientList 
-                clients={paginatedClients}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                isLoading={isLoading}
-                onPageChange={handlePageChange}
-              />
-            ) : (
-              <ClientEmptyState 
-                searchQuery={searchQuery} 
-                activeFilter={activeFilter} 
-              />
-            )}
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <LoadingSkeleton />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {paginatedClients.length > 0 ? (
+                <VirtualizedClientList
+                  clients={paginatedClients}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  isLoading={isLoading}
+                  onPageChange={handlePageChange}
+                />
+              ) : (
+                <ClientEmptyState 
+                  searchQuery={searchQuery} 
+                  activeFilter={activeFilter} 
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+      
+      <AdvancedFilterSheet
+        open={isFilterSheetOpen}
+        onOpenChange={setIsFilterSheetOpen}
+        filters={advancedFilters}
+        onApplyFilters={handleAdvancedFilters}
+      />
       
       <AddClientFab />
     </Layout>

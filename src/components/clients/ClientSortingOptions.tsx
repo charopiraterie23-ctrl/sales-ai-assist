@@ -7,46 +7,32 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 
 interface ClientSortingOptionsProps {
   sortType: string;
   sortDirection: 'asc' | 'desc';
   handleSort: (type: string) => void;
+  onOpenFilters: () => void;
+  hasActiveFilters: boolean;
 }
 
-const ClientSortingOptions = ({ sortType, sortDirection, handleSort }: ClientSortingOptionsProps) => {
+const ClientSortingOptions = ({ 
+  sortType, 
+  sortDirection, 
+  handleSort,
+  onOpenFilters,
+  hasActiveFilters
+}: ClientSortingOptionsProps) => {
   return (
     <div className="flex items-center justify-between mt-3">
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="outline" size="sm" className="flex items-center gap-2 h-9 px-4">
-            <Filter className="h-4 w-4" /> Filtres
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="h-[70vh]">
-          <SheetHeader className="pb-2">
-            <SheetTitle>Filtres avancés</SheetTitle>
-            <SheetDescription>
-              Affinez votre recherche avec des filtres supplémentaires.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="py-6">
-            <p className="text-sm text-gray-500">Options de filtrage à venir...</p>
-          </div>
-          <SheetFooter>
-            <Button className="w-full sm:w-auto">Appliquer les filtres</Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
+      <Button 
+        variant={hasActiveFilters ? "default" : "outline"} 
+        size="sm" 
+        className="flex items-center gap-2 h-9 px-4"
+        onClick={onOpenFilters}
+      >
+        <Filter className="h-4 w-4" /> Filtres
+      </Button>
       
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
