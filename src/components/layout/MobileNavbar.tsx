@@ -16,17 +16,17 @@ const MobileNavbar = () => {
     },
     {
       path: '/record',
-      label: 'Enregistrer',
+      label: 'Nouveau',
       icon: <Mic size={20} />,
     },
     {
       path: '/clients',
-      label: 'Clients',
+      label: 'Contacts',
       icon: <Users size={20} />,
     },
     {
       path: '/calls',
-      label: 'Appels',
+      label: 'Résumés',
       icon: <Phone size={20} />,
     },
     {

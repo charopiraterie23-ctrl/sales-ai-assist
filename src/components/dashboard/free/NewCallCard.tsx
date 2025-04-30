@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Upload, Loader2 } from 'lucide-react';
+import { Mic, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -20,9 +20,9 @@ const NewCallCard = ({ isLoading = false }: NewCallCardProps) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <CardContent className="pt-6">
-        <h3 className="text-lg font-semibold mb-4">Nouvel appel</h3>
+        <h3 className="text-lg font-semibold mb-4">Nouveau résumé</h3>
         <Button 
-          className="w-full h-16 bg-nexentry-blue hover:bg-nexentry-blue-dark text-base gap-3 transition-all duration-300"
+          className="w-full h-16 bg-nexentry-blue hover:bg-nexentry-blue-dark text-base transition-all duration-300"
           onClick={() => navigate('/record')}
           disabled={isLoading}
           style={{ 
@@ -36,11 +36,8 @@ const NewCallCard = ({ isLoading = false }: NewCallCardProps) => {
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 animate-fade-in">
-                <Mic className="h-5 w-5" />
-                <Upload className="h-5 w-5" />
-              </div>
-              <span>Uploader ou enregistrer un appel</span>
+              <Mic className="h-5 w-5" />
+              <span>Créer un résumé d'échange</span>
             </div>
           )}
         </Button>
