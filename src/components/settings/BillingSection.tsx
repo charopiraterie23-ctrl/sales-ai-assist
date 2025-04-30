@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 
 const BillingSection = () => {
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         <CreditCard className="mr-2" /> Plan et facturation
       </h2>

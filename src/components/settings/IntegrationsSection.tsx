@@ -16,7 +16,7 @@ const IntegrationsSection = ({
   handleEmailDisconnect
 }: IntegrationsSectionProps) => {
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         <LinkIcon className="mr-2" /> Intégrations
       </h2>

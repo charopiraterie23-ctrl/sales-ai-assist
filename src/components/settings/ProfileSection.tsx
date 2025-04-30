@@ -40,7 +40,7 @@ const ProfileSection = ({
     .toUpperCase();
 
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold flex items-center">
           <User className="mr-2" /> Profil personnel
@@ -108,9 +108,9 @@ const ProfileSection = ({
             ) : (
               <>
                 <p className="font-medium">{profile.full_name}</p>
-                <p className="text-sm text-gray-500">{profile.email}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{profile.email}</p>
                 {profile.phone_number && (
-                  <p className="text-sm text-gray-500">{profile.phone_number}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{profile.phone_number}</p>
                 )}
               </>
             )}
@@ -118,7 +118,7 @@ const ProfileSection = ({
         </div>
         
         <div>
-          <Label className="text-sm text-gray-500">Type de compte</Label>
+          <Label className="text-sm text-gray-500 dark:text-gray-400">Type de compte</Label>
           <p className="text-sm font-medium">
             {profile.plan === 'pro' ? 'Pro' : 'Gratuit'}
           </p>

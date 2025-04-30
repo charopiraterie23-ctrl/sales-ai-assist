@@ -4,7 +4,7 @@ import { HelpCircle } from 'lucide-react';
 
 const SupportSection = () => {
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         <HelpCircle className="mr-2" /> Support / Legal
       </h2>
