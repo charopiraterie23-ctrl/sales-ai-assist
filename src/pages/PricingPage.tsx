@@ -31,9 +31,9 @@ const plans = [
   {
     id: '3',
     name: 'Team',
-    priceMonthly: 199,
-    usersIncluded: 15,
-    features: ['Toutes les fonctions Pro', '15 utilisateurs inclus', 'Tableau admin'],
+    priceMonthly: 79,
+    usersIncluded: 5,
+    features: ['Toutes les fonctions Pro', '5 utilisateurs inclus', 'Tableau d\'équipe', 'Rapports analytiques'],
     ctaLabel: 'Démarrer Team',
     stripeProductId: 'prod_team',
   },
@@ -93,7 +93,7 @@ const PricingPage = () => {
                 Comment fonctionne l'essai gratuit de 7 jours ?
               </AccordionTrigger>
               <AccordionContent>
-                Vous bénéficiez d'un accès complet aux fonctionnalités Pro pendant 7 jours sans avoir à entrer de carte bancaire. À la fin de la période d'essai, vous pouvez choisir de passer au forfait payant ou votre compte reviendra automatiquement à la version gratuite.
+                Vous bénéficiez d'un accès complet aux fonctionnalités Pro pendant 7 jours sans avoir à entrer de carte bancaire. À la fin de la période d'essai, vous pouvez choisir de passer au forfait payant.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="q2">
@@ -117,7 +117,7 @@ const PricingPage = () => {
                 Les SMS sont-ils inclus dans tous les forfaits ?
               </AccordionTrigger>
               <AccordionContent>
-                La fonctionnalité d'envoi de SMS est disponible uniquement dans les forfaits Pro, Team et Entreprise. Le forfait Free ne permet que la création de résumés.
+                La fonctionnalité d'envoi de SMS est disponible dans tous les forfaits payants : Pro, Team et Entreprise.
               </AccordionContent>
             </AccordionItem>
           </Accordion>

@@ -42,8 +42,7 @@ serve(async (req: Request) => {
       throw new Error('Missing planId parameter');
     }
 
-    // In a real implementation, you'd query your database for plan details
-    // For this example, we'll use hardcoded plans
+    // Updated plans with the new Team plan at $79 and no Free plan
     const plans = {
       '1': { name: 'Essai Pro', stripeProductId: 'prod_trial_pro', trialDays: 7 },
       '2': { name: 'Pro', stripeProductId: 'prod_pro', trialDays: 7 },

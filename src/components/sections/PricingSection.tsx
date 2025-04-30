@@ -20,23 +20,10 @@ const PricingSection = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           <PricingCard
-            title="Free"
-            price="0$"
-            description="Pour tester l'expérience"
-            features={[
-              "Jusqu'à 3 résumés/mois",
-              "Résumés uniquement",
-              "1 contact"
-            ]}
-            buttonText="Commencer gratuitement"
-            onClick={() => handleButtonClick("/register")}
-            highlight={false}
-          />
-          <PricingCard
             title="Pro"
             price="19$"
             badge="Essai gratuit 7 j"
-            description="Pour les professionnels"
+            description="/ mois / utilisateur"
             features={[
               "Résumés illimités",
               "Emails et SMS de suivi",
@@ -49,9 +36,24 @@ const PricingSection = () => {
             highlight={true}
           />
           <PricingCard
+            title="Équipe"
+            price="79$"
+            description="/ mois"
+            features={[
+              "Toutes les fonctions Pro",
+              "Jusqu'à 5 utilisateurs",
+              "Tableau de bord d'équipe",
+              "Rapport analytiques",
+              "Synchronisation des contacts"
+            ]}
+            buttonText="Démarrer"
+            onClick={() => handleButtonClick("/register")}
+            highlight={false}
+          />
+          <PricingCard
             title="Entreprise"
             price="Sur mesure"
-            description="Pour les grandes équipes"
+            description=""
             features={[
               "Déploiement personnalisé",
               "API dédiée",
