@@ -1,8 +1,15 @@
 
 import React from "react";
 import PricingCard from "@/components/pricing/PricingCard";
+import { useNavigate } from "react-router-dom";
 
 const PricingSection = () => {
+  const navigate = useNavigate();
+
+  const handleButtonClick = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <section id="pricing" className="py-16 px-4 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -22,7 +29,7 @@ const PricingSection = () => {
               "CRM de base"
             ]}
             buttonText="Commencer gratuitement"
-            buttonLink="/register"
+            onClick={() => handleButtonClick("/register")}
             highlight={false}
           />
           <PricingCard
@@ -38,7 +45,7 @@ const PricingSection = () => {
               "CRM complet"
             ]}
             buttonText="Passer au Pro"
-            buttonLink="/register"
+            onClick={() => handleButtonClick("/register")}
             highlight={true}
           />
           <PricingCard
@@ -52,7 +59,7 @@ const PricingSection = () => {
               "Support dédié"
             ]}
             buttonText="Contactez-nous"
-            buttonLink="/contact"
+            onClick={() => handleButtonClick("/contact")}
             highlight={false}
           />
         </div>
