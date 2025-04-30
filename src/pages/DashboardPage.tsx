@@ -6,24 +6,16 @@ import Layout from '@/components/layout/Layout';
 import { useDashboardData } from '@/hooks/useDashboardData';
 import { useEmailConnection } from '@/hooks/useEmailConnection';
 import { toast } from '@/components/ui/sonner';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar, Link } from 'lucide-react';
-import { Activity } from '@/components/dashboard/ActivityFeed';
-import ActivityFeed from '@/components/dashboard/ActivityFeed';
-import IntegrationsCard from '@/components/dashboard/IntegrationsCard';
-import TodaySummaryCard from '@/components/dashboard/TodaySummaryCard';
-import DraftEmailsCard from '@/components/dashboard/DraftEmailsCard';
-import InsightsCard from '@/components/dashboard/InsightsCard';
-import ActiveClientsCard from '@/components/dashboard/ActiveClientsCard';
 import DashboardLoading from '@/components/dashboard/DashboardLoading';
+import DashboardWelcomeHeader from '@/components/dashboard/DashboardWelcomeHeader';
+import DashboardContent from '@/components/dashboard/DashboardContent';
 
 const DashboardPage = () => {
   const { user, profile, isLoading } = useAuth();
   const navigate = useNavigate();
   const [hasRecentCall, setHasRecentCall] = useState(false);
   const [isActivityLoading, setIsActivityLoading] = useState(true);
+  const [tipIndex, setTipIndex] = useState(Math.floor(Math.random() * 4)); // Random tip index
   
   // Récupération des données du dashboard via le hook personnalisé
   const dashboardData = useDashboardData(user?.id);
@@ -72,10 +64,10 @@ const DashboardPage = () => {
   const readyEmails = dashboardData.emailsToSend?.emails.length || 0;
   const clientsToFollowUp = 0; // Placeholder pour la future fonctionnalité
   
-  const handleSendAllEmails = () => {
-    // Simuler l'envoi des emails
-    console.log('Sending all emails:', dashboardData.emailsToSend?.emails);
-  };
+  // Calcul pour l'affichage de l'utilisation
+  const callsUsed = dashboardData.callsThisMonth?.total_calls || 0;
+  const callsTotal = userPlan === 'pro' ? 100 : 3; // Limits based on plan
+  const usagePercentage = Math.min(100, Math.round((callsUsed / callsTotal) * 100));
   
   if (isLoading || dashboardData.isLoadingData) {
     return (
@@ -89,109 +81,34 @@ const DashboardPage = () => {
     <Layout title="Accueil" showNavbar={true} showFAB={true}>
       <div className="space-y-6 pb-20">
         {/* Message de bienvenue avec minutes restantes */}
-        <div className="animate-fade-in">
-          <h1 className="text-2xl font-bold mb-1">
-            Bonjour {profile?.full_name?.split(' ')[0] || 'utilisateur'} 👋
-          </h1>
-          <div className="flex justify-between items-center">
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              Prêt·e pour une journée productive ?
-            </p>
-            {showTrialBanner && (
-              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                {trialMinutesRemaining} min audio restantes
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Carte intégrations - affichée seulement si email ou SMS non connectés */}
-        <IntegrationsCard 
-          isEmailConnected={isEmailConnected} 
-          isSMSConnected={isSMSConnected} 
-          onConnectEmail={() => connectEmail('gmail')}
-          onConnectSMS={() => console.log('SMS connect functionality to be implemented')} 
+        <DashboardWelcomeHeader 
+          fullName={profile?.full_name?.split(' ')[0] || 'utilisateur'} 
+          userPlan={userPlan}
+          trialMinutesRemaining={trialMinutesRemaining}
+          showTrialBanner={showTrialBanner}
         />
 
-        {/* Carte Ma Journée */}
-        <TodaySummaryCard 
+        {/* Content based on user plan */}
+        <DashboardContent
+          userPlan={userPlan}
+          isEmailConnected={isEmailConnected}
+          isSMSConnected={isSMSConnected}
           pendingCallsToday={pendingCallsToday}
           readyEmails={readyEmails}
           clientsToFollowUp={clientsToFollowUp}
-          navigateToActions={() => navigate('/daily-actions')}
-          isClickToCallEnabled={false}
-        />
-
-        {/* Section Fil d'activité */}
-        <div className="pt-2">
-          <h2 className="text-base font-semibold mb-2">Fil d'activité</h2>
-          <ScrollArea className="h-[38vh] rounded-2xl border">
-            <ActivityFeed 
-              isLoading={isActivityLoading}
-              activities={mockActivities} 
-            />
-          </ScrollArea>
-        </div>
-
-        {/* Carte Brouillons à envoyer */}
-        <DraftEmailsCard 
-          isEmailConnected={isEmailConnected}
-          isLoading={dashboardData.isLoadingEmails}
-          emails={dashboardData.emailsToSend?.emails}
+          callsUsed={callsUsed}
+          callsTotal={callsTotal}
+          usagePercentage={usagePercentage}
+          dashboardData={dashboardData}
+          isActivityLoading={isActivityLoading}
+          hasRecentCall={hasRecentCall}
+          navigate={navigate}
+          tipIndex={tipIndex}
           onConnectEmail={() => connectEmail('gmail')}
-          onSendAll={handleSendAllEmails}
         />
-
-        {/* Carte Insights */}
-        <InsightsCard />
-
-        {/* Carte Clients actifs */}
-        <ActiveClientsCard />
-        
-        {/* Spacer pour bottom nav */}
-        <div className="h-[72px]"></div>
       </div>
     </Layout>
   );
 };
-
-// Sample activities for development
-const mockActivities: Activity[] = [
-  {
-    id: '1',
-    title: 'Appel avec Jean Dupont',
-    excerpt: 'Discussion sur le projet de refonte du site web. Prochaine étape: valider la maquette.',
-    tags: [{ name: 'urgent', color: 'red' }, { name: 'web', color: 'blue' }],
-    status: 'new' as 'new' | 'sent' | 'archived'
-  },
-  {
-    id: '2',
-    title: 'Réunion équipe marketing',
-    excerpt: 'Planification de la campagne Q2. Budget validé à 15k$.',
-    tags: [{ name: 'marketing', color: 'green' }],
-    status: 'sent' as 'new' | 'sent' | 'archived'
-  },
-  {
-    id: '3',
-    title: 'Appel de suivi Sophie Martin',
-    excerpt: "Intérêt pour l'offre premium. Relancer dans 2 semaines.",
-    tags: [{ name: 'lead', color: 'purple' }],
-    status: 'new' as 'new' | 'sent' | 'archived'
-  },
-  {
-    id: '4',
-    title: 'Point hebdo Jacques',
-    excerpt: 'Revue des KPIs et ajustement des objectifs du trimestre.',
-    tags: [{ name: 'interne', color: 'gray' }],
-    status: 'archived' as 'new' | 'sent' | 'archived'
-  },
-  {
-    id: '5',
-    title: 'Consultation Entreprise ABC',
-    excerpt: 'Besoin identifié: solution de gestion de projet. Budget ~5k$/mois.',
-    tags: [{ name: 'opportunité', color: 'amber' }],
-    status: 'sent' as 'new' | 'sent' | 'archived'
-  }
-];
 
 export default DashboardPage;

@@ -39,23 +39,25 @@ const Layout = ({
       
       {showNavbar && <MobileNavbar />}
       
-      <TooltipProvider delayDuration={700}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button 
-              size="icon"
-              aria-label="Nouveau résumé"
-              className="fixed bottom-[88px] right-6 w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white z-40 hover:bg-blue-600 transition-colors"
-              onClick={() => window.location.href = '/record'}
-            >
-              <Plus size={24} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Nouveau résumé</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      {showFAB && (
+        <TooltipProvider delayDuration={700}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                size="icon"
+                aria-label="Nouveau résumé"
+                className="fixed bottom-[88px] right-6 w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white z-40 hover:bg-blue-600 transition-colors"
+                onClick={() => window.location.href = '/record'}
+              >
+                <Plus size={24} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Nouveau résumé</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      )}
     </div>
   );
 };
