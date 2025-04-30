@@ -1,6 +1,6 @@
 
-import { Link } from 'react-router-dom';
-import { Bell } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import UserMenu from './UserMenu';
 
@@ -11,6 +11,12 @@ interface HeaderProps {
 }
 
 const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => {
+  const navigate = useNavigate();
+  
+  const handleSearchClick = () => {
+    navigate('/search');
+  };
+  
   return (
     <header className="sticky top-0 z-50 w-full bg-white dark:bg-[#111827] border-b border-gray-200 dark:border-gray-800 px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
       <div className="flex items-center justify-between">
@@ -42,6 +48,15 @@ const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => 
           <h1 className="text-lg font-semibold text-[#111827] dark:text-white">{title}</h1>
         </div>
         <div className="flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-[#6B7280] hover:text-[#111827]"
+            aria-label="Recherche"
+            onClick={handleSearchClick}
+          >
+            <Search size={20} />
+          </Button>
           <Button 
             variant="ghost" 
             size="icon" 

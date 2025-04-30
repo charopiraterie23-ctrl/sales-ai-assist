@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mail } from 'lucide-react';
 import { Email } from '@/types/dashboardTypes';
+import { useToast } from '@/hooks/use-toast';
 
 interface DraftEmailsCardProps {
   isEmailConnected: boolean;
@@ -20,6 +21,29 @@ const DraftEmailsCard: React.FC<DraftEmailsCardProps> = ({
   onConnectEmail,
   onSendAll
 }) => {
+  const { toast } = useToast();
+  
+  const handleSendAll = () => {
+    // Show loading state
+    toast({
+      title: "Envoi en cours",
+      description: `Envoi de ${emails.length} email(s) en cours...`,
+      duration: 2000
+    });
+    
+    // Call the actual function
+    onSendAll();
+    
+    // Show success toast
+    setTimeout(() => {
+      toast({
+        title: "Emails envoyés !",
+        description: `${emails.length} email(s) ont été envoyés avec succès.`,
+        variant: "default"
+      });
+    }, 2000);
+  };
+  
   if (isLoading) {
     return (
       <Card className="animate-pulse">
@@ -88,7 +112,7 @@ const DraftEmailsCard: React.FC<DraftEmailsCardProps> = ({
           )}
         </div>
         
-        <Button className="w-full" onClick={onSendAll}>
+        <Button className="w-full" onClick={handleSendAll}>
           <Mail className="mr-2 h-4 w-4" /> Tout envoyer
         </Button>
       </CardContent>

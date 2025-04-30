@@ -1,6 +1,9 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 interface Activity {
   id: string;
@@ -48,7 +51,17 @@ const mockActivities: Activity[] = [
   }
 ];
 
-const ActivityFeed: React.FC = () => {
+interface ActivityFeedProps {
+  activities?: Activity[];
+  isLoading?: boolean;
+}
+
+const ActivityFeed: React.FC<ActivityFeedProps> = ({ 
+  activities = mockActivities,
+  isLoading = false 
+}) => {
+  const navigate = useNavigate();
+  
   // Function to get status color
   const getStatusColor = (status: Activity['status']): string => {
     switch(status) {
@@ -59,9 +72,55 @@ const ActivityFeed: React.FC = () => {
     }
   };
 
+  // Create example summary
+  const handleCreateExample = () => {
+    navigate('/record?template=example');
+  };
+
+  // Render loading skeleton
+  if (isLoading) {
+    return (
+      <div className="divide-y divide-gray-100 dark:divide-gray-800">
+        {[1, 2].map((item) => (
+          <div key={item} className="p-3 animate-pulse">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6 mb-3"></div>
+            <div className="flex gap-2">
+              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+              <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Render empty state
+  if (activities.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-32 p-4 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-3"
+        >
+          <div className="text-6xl mb-2">📝</div>
+          <h3 className="text-lg font-medium mb-1">Aucune activité aujourd'hui</h3>
+          <p className="text-sm text-gray-500 mb-3">Créez votre premier résumé pour commencer</p>
+        </motion.div>
+        <Button onClick={handleCreateExample}>
+          Créer un résumé d'exemple
+        </Button>
+      </div>
+    );
+  }
+
+  // Render activity list
   return (
     <div className="divide-y divide-gray-100 dark:divide-gray-800">
-      {mockActivities.map((activity) => (
+      {activities.map((activity) => (
         <div key={activity.id} className="p-3 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
           <div className={`w-1 self-stretch rounded-full ${getStatusColor(activity.status)}`}></div>
           

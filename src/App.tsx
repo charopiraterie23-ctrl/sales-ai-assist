@@ -18,6 +18,7 @@ import CallsPage from "./pages/CallsPage";
 import DashboardPage from "./pages/DashboardPage";
 import DailyActionsPage from "./pages/DailyActionsPage";
 import PricingPage from "./pages/PricingPage";
+import SearchPage from "./pages/SearchPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import SettingsPage from "./pages/SettingsPage";
@@ -84,6 +85,11 @@ const App = () => (
             <Route path="/daily-actions" element={
               <ProtectedRoute>
                 <DailyActionsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/search" element={
+              <ProtectedRoute>
+                <SearchPage />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

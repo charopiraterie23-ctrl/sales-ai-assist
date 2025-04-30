@@ -17,6 +17,7 @@ const IntegrationsCard: React.FC<IntegrationsCardProps> = ({
   onConnectEmail,
   onConnectSMS
 }) => {
+  // Hide the card if both email and SMS are connected
   if (isEmailConnected && isSMSConnected) return null;
   
   return (
