@@ -1,7 +1,10 @@
 
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Search } from 'lucide-react';
+import { Search, Bell, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import UserMenu from './UserMenu';
 
 interface HeaderProps {
@@ -19,53 +22,44 @@ const Header = ({ title, showBackButton = false, onBackClick, className }: Heade
   };
   
   return (
-    <header className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-[#111827]/80 border-b border-gray-200 dark:border-gray-800 px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.04)] backdrop-blur-md ${className ?? ''}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
+    <header className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 px-4 py-4 ${className ?? ''}`}>
+      <div className="flex items-center justify-between max-w-6xl mx-auto">
+        <div className="flex items-center space-x-3">
           {showBackButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mr-2 p-0 h-8 w-8"
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={onBackClick}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              <span className="sr-only">Retour</span>
-            </Button>
+              <ChevronLeft className="h-5 w-5" />
+            </motion.button>
           )}
-          <h1 className="text-lg font-semibold text-[#111827] dark:text-white">{title}</h1>
+          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">
+            {title}
+          </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-[#6B7280] hover:text-[#111827]"
-            aria-label="Recherche"
+        
+        <div className="flex items-center space-x-3">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleSearchClick}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
           >
-            <Search size={20} />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-[#6B7280] hover:text-[#111827]"
-            aria-label="Notifications"
+            <Search className="h-5 w-5" />
+          </motion.button>
+          
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
           >
-            <Bell size={20} />
-          </Button>
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+          </motion.button>
+          
+          <ThemeToggle />
+          
           <UserMenu />
         </div>
       </div>
