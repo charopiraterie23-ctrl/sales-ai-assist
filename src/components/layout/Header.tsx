@@ -22,21 +22,25 @@ const Header = ({ title, showBackButton = false, onBackClick, className }: Heade
   };
   
   return (
-    <header className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-gray-800 px-4 py-4 ${className ?? ''}`}>
+    <header className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-100/50 dark:border-gray-800/50 px-4 py-4 ${className ?? ''}`}>
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         <div className="flex items-center space-x-3">
           {showBackButton && (
             <motion.button
-              whileTap={{ scale: 0.9 }}
+              whileTap={{ scale: 0.92 }}
               onClick={onBackClick}
-              className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 shadow-sm"
             >
               <ChevronLeft className="h-5 w-5" />
             </motion.button>
           )}
-          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-blue-700 dark:from-blue-400 dark:to-blue-600">
+          <motion.h1 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-xl font-bold gradient-text"
+          >
             {title}
-          </h1>
+          </motion.h1>
         </div>
         
         <div className="flex items-center space-x-3">
@@ -44,7 +48,7 @@ const Header = ({ title, showBackButton = false, onBackClick, className }: Heade
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSearchClick}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 shadow-sm"
           >
             <Search className="h-5 w-5" />
           </motion.button>
@@ -52,10 +56,10 @@ const Header = ({ title, showBackButton = false, onBackClick, className }: Heade
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 shadow-sm"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse-soft"></span>
           </motion.button>
           
           <ThemeToggle />

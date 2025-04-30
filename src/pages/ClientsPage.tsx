@@ -18,6 +18,7 @@ import AdvancedFilterSheet from '@/components/clients/AdvancedFilterSheet';
 import { useClientData } from '@/hooks/useClientData';
 import { AnimatePresence } from 'framer-motion';
 import { ClientStatus } from '@/types/client';
+import ClientList from '@/components/clients/ClientList';
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -65,6 +66,16 @@ const ClientsPage = () => {
     setActiveFilter(value as ClientStatus);
   };
 
+  const handleSwipeLeft = (clientId: string) => {
+    console.log(`Call client: ${clientId}`);
+    // Implementation for calling
+  };
+
+  const handleSwipeRight = (clientId: string) => {
+    console.log(`Message client: ${clientId}`);
+    // Implementation for messaging
+  };
+
   return (
     <Layout title="Clients" showFAB={false}>
       <div className="space-y-5">
@@ -72,52 +83,53 @@ const ClientsPage = () => {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className="sticky top-[64px] z-10 bg-white dark:bg-gray-900 pt-4 pb-3 px-1 rounded-b-3xl shadow-sm"
+          className="sticky top-[64px] z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl pt-4 pb-3 px-1 rounded-b-3xl shadow-sm"
         >
           <motion.div variants={itemVariants}>
-            <div className="relative mb-3">
-              <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <Input
                 placeholder="Rechercher un client..."
-                className="pl-10 pr-10 bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 h-10 rounded-xl"
+                className="pl-10 pr-10 bg-gray-50 dark:bg-gray-800 border-gray-100/50 dark:border-gray-700/50 h-12 rounded-xl shadow-sm focus:shadow-md transition-shadow"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchQuery && (
-                <button 
-                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                <motion.button 
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
                   onClick={() => setSearchQuery('')}
+                  whileTap={{ scale: 0.9 }}
                 >
                   <X size={18} />
-                </button>
+                </motion.button>
               )}
             </div>
           </motion.div>
           
-          <motion.div variants={itemVariants} className="mb-3">
+          <motion.div variants={itemVariants} className="mb-4">
             <Tabs defaultValue={activeFilter} onValueChange={handleTabChange} className="w-full">
-              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 p-1 rounded-xl">
+              <TabsList className="w-full bg-gray-50 dark:bg-gray-800 p-1.5 rounded-xl shadow-sm">
                 <TabsTrigger
                   value="all"
-                  className="flex-1 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
+                  className="flex-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nexentry-purple data-[state=active]:to-nexentry-purple-vivid data-[state=active]:text-white dark:data-[state=active]:from-nexentry-purple dark:data-[state=active]:to-nexentry-purple-vivid dark:data-[state=active]:text-white"
                 >
                   Tous
                 </TabsTrigger>
                 <TabsTrigger
                   value="lead"
-                  className="flex-1 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
+                  className="flex-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nexentry-purple data-[state=active]:to-nexentry-purple-vivid data-[state=active]:text-white dark:data-[state=active]:from-nexentry-purple dark:data-[state=active]:to-nexentry-purple-vivid dark:data-[state=active]:text-white"
                 >
                   Leads
                 </TabsTrigger>
                 <TabsTrigger
                   value="intéressé"
-                  className="flex-1 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
+                  className="flex-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nexentry-purple data-[state=active]:to-nexentry-purple-vivid data-[state=active]:text-white dark:data-[state=active]:from-nexentry-purple dark:data-[state=active]:to-nexentry-purple-vivid dark:data-[state=active]:text-white"
                 >
                   Intéressés
                 </TabsTrigger>
                 <TabsTrigger
                   value="en attente"
-                  className="flex-1 rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-gray-700"
+                  className="flex-1 rounded-lg data-[state=active]:bg-gradient-to-r data-[state=active]:from-nexentry-purple data-[state=active]:to-nexentry-purple-vivid data-[state=active]:text-white dark:data-[state=active]:from-nexentry-purple dark:data-[state=active]:to-nexentry-purple-vivid dark:data-[state=active]:text-white"
                 >
                   En attente
                 </TabsTrigger>
@@ -131,12 +143,12 @@ const ClientsPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={handleOpenFilterSheet}
-                className="flex items-center gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-100/50 dark:border-gray-700/50 h-10 shadow-sm"
               >
                 <SlidersHorizontal size={14} />
                 <span>Filtres</span>
                 {hasActiveAdvancedFilters && (
-                  <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center">
+                  <Badge variant="default" className="ml-1 h-5 w-5 p-0 flex items-center justify-center bg-nexentry-purple">
                     {Object.keys(advancedFilters).filter(key => 
                       advancedFilters[key] !== '' && advancedFilters[key] !== null
                     ).length}
@@ -148,7 +160,7 @@ const ClientsPage = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => handleSort(sortType === 'name' ? 'date' : 'name')}
-                className="flex items-center gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700"
+                className="flex items-center gap-1 rounded-xl bg-gray-50 dark:bg-gray-800 border-gray-100/50 dark:border-gray-700/50 h-10 shadow-sm"
               >
                 <span>Trier: {sortType === 'name' ? 'Nom' : 'Date'}</span>
               </Button>
@@ -156,7 +168,7 @@ const ClientsPage = () => {
             
             <Button
               size="sm"
-              className="rounded-xl bg-blue-600 hover:bg-blue-700"
+              className="rounded-xl bg-gradient-to-r from-nexentry-purple to-nexentry-purple-vivid hover:from-nexentry-purple-vivid hover:to-nexentry-purple shadow-sm h-10"
               onClick={() => navigate('/clients/add')}
             >
               <Plus size={16} className="mr-1" />
@@ -185,12 +197,10 @@ const ClientsPage = () => {
               transition={{ duration: 0.2 }}
             >
               {paginatedClients.length > 0 ? (
-                <VirtualizedClientList
+                <ClientList 
                   clients={paginatedClients}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  isLoading={isLoading}
-                  onPageChange={handlePageChange}
+                  onSwipeLeft={handleSwipeLeft}
+                  onSwipeRight={handleSwipeRight}
                 />
               ) : (
                 <ClientEmptyState 

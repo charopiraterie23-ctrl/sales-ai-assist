@@ -1,5 +1,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -25,7 +26,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 243 75% 70%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
@@ -35,7 +36,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -66,7 +67,7 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 243 75% 70%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -93,7 +94,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-montserrat;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -115,18 +116,45 @@
   }
   
   .nexentry-card {
-    @apply bg-white dark:bg-nexentry-blue-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-4 sm:p-6 animate-fade-in;
+    @apply bg-white dark:bg-nexentry-blue-dark rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 border border-gray-100/50 dark:border-gray-800/50 p-5 sm:p-6 animate-fade-in;
   }
   
   .nexentry-button-primary {
-    @apply bg-nexentry-blue hover:bg-nexentry-blue-dark text-white rounded-lg px-4 py-2 font-medium transition-colors duration-200;
+    @apply bg-gradient-to-r from-nexentry-purple to-nexentry-purple-vivid hover:from-nexentry-purple-vivid hover:to-nexentry-purple text-white rounded-xl px-5 py-2.5 font-medium transition-all duration-300 shadow-sm hover:shadow-md;
   }
   
   .nexentry-button-secondary {
-    @apply bg-nexentry-gray-light hover:bg-gray-200 text-nexentry-blue-dark rounded-lg px-4 py-2 font-medium transition-colors duration-200;
+    @apply bg-nexentry-gray-light hover:bg-gray-200 text-nexentry-blue-dark rounded-xl px-5 py-2.5 font-medium transition-colors duration-300;
   }
   
   .nexentry-input {
-    @apply w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-gray-100 focus:border-nexentry-blue focus:ring-1 focus:ring-nexentry-blue;
+    @apply w-full rounded-xl border border-gray-200/50 dark:border-gray-700/50 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-gray-100 focus:border-nexentry-purple focus:ring-2 focus:ring-nexentry-purple/20 transition-all duration-200;
   }
+  
+  .glass-card {
+    @apply backdrop-blur-md bg-white/50 dark:bg-gray-900/50 border border-white/20 dark:border-gray-700/20 shadow-soft;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-nexentry-purple-vivid to-nexentry-blue-light bg-clip-text text-transparent;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
 }

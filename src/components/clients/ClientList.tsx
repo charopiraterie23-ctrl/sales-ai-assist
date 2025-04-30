@@ -1,88 +1,71 @@
 
-import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import ClientCard from '@/components/cards/ClientCard';
-import { ClientType } from '@/types/client';
-import { useToast } from '@/hooks/use-toast';
-import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface ClientListProps {
-  clients: ClientType[];
-  currentPage: number;
-  totalPages: number;
-  isLoading: boolean;
-  onPageChange: (page: number) => void;
+interface Client {
+  id: string;
+  fullName: string;
+  company?: string;
+  email?: string;
+  phone?: string;
+  lastContacted?: Date;
+  status: 'lead' | 'intéressé' | 'en attente' | 'conclu' | 'perdu';
 }
 
-const ClientList = ({ clients, currentPage, totalPages, isLoading, onPageChange }: ClientListProps) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
+interface ClientListProps {
+  clients: Client[];
+  onSwipeLeft?: (clientId: string) => void;
+  onSwipeRight?: (clientId: string) => void;
+}
 
-  const handleCall = (clientId: string, name: string) => {
-    toast({
-      title: "Appel en cours",
-      description: `Appel vers ${name}...`,
-    });
+const ClientList = ({ clients, onSwipeLeft, onSwipeRight }: ClientListProps) => {
+  const navigate = useNavigate();
+  
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
   };
   
-  const handleMessage = (clientId: string, name: string) => {
-    toast({
-      title: "Suivi client",
-      description: `Préparation d'un message pour ${name}`,
-    });
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
+  const handleClientClick = (clientId: string) => {
+    navigate(`/clients/${clientId}`);
   };
 
   return (
-    <div>
-      <div className="space-y-4 animate-fade-in pb-6 px-1">
-        {clients.map((client) => (
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="space-y-2"
+    >
+      {clients.map((client) => (
+        <motion.div key={client.id} variants={item} layout>
           <ClientCard
-            key={client.clientId}
-            clientId={client.clientId}
+            clientId={client.id}
             fullName={client.fullName}
             company={client.company}
             email={client.email}
             phone={client.phone}
             lastContacted={client.lastContacted}
             status={client.status}
-            onClick={() => navigate(`/client/${client.clientId}`)}
-            onSwipeLeft={() => handleCall(client.clientId, client.fullName)}
-            onSwipeRight={() => handleMessage(client.clientId, client.fullName)}
+            onClick={() => handleClientClick(client.id)}
+            onSwipeLeft={() => onSwipeLeft && onSwipeLeft(client.id)}
+            onSwipeRight={() => onSwipeRight && onSwipeRight(client.id)}
           />
-        ))}
-      </div>
-      
-      {/* Pagination component */}
-      {totalPages > 1 && (
-        <Pagination className="mt-8 pb-24">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-            
-            {[...Array(totalPages)].map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink 
-                  isActive={currentPage === i + 1}
-                  onClick={() => onPageChange(i + 1)}
-                >
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            
-            <PaginationItem>
-              <PaginationNext 
-                onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      )}
-    </div>
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
 

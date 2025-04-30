@@ -18,15 +18,15 @@ const generateAvatarColor = (name: string) => {
   
   // Define a set of vibrant gradient backgrounds
   const gradients = [
-    'bg-gradient-to-br from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700',
-    'bg-gradient-to-br from-green-400 to-green-600 dark:from-green-500 dark:to-green-700',
-    'bg-gradient-to-br from-purple-400 to-purple-600 dark:from-purple-500 dark:to-purple-700',
-    'bg-gradient-to-br from-yellow-400 to-amber-600 dark:from-yellow-500 dark:to-amber-700',
+    'bg-gradient-to-br from-blue-400 to-indigo-600 dark:from-blue-500 dark:to-indigo-700',
+    'bg-gradient-to-br from-green-400 to-teal-600 dark:from-green-500 dark:to-teal-700',
+    'bg-gradient-to-br from-purple-400 to-indigo-600 dark:from-purple-500 dark:to-indigo-700',
+    'bg-gradient-to-br from-yellow-400 to-orange-600 dark:from-yellow-500 dark:to-orange-700',
     'bg-gradient-to-br from-pink-400 to-rose-600 dark:from-pink-500 dark:to-rose-700',
-    'bg-gradient-to-br from-indigo-400 to-indigo-600 dark:from-indigo-500 dark:to-indigo-700',
-    'bg-gradient-to-br from-red-400 to-red-600 dark:from-red-500 dark:to-red-700',
-    'bg-gradient-to-br from-orange-400 to-orange-600 dark:from-orange-500 dark:to-orange-700',
-    'bg-gradient-to-br from-teal-400 to-teal-600 dark:from-teal-500 dark:to-teal-700',
+    'bg-gradient-to-br from-indigo-400 to-purple-600 dark:from-indigo-500 dark:to-purple-700',
+    'bg-gradient-to-br from-red-400 to-pink-600 dark:from-red-500 dark:to-pink-700',
+    'bg-gradient-to-br from-orange-400 to-red-600 dark:from-orange-500 dark:to-red-700',
+    'bg-gradient-to-br from-teal-400 to-green-600 dark:from-teal-500 dark:to-green-700',
   ];
   
   // Use the hash to select a gradient
@@ -53,8 +53,11 @@ const ClientAvatar = ({ fullName, imageUrl, size = 'md' }: ClientAvatarProps) =>
   };
   
   return (
-    <motion.div whileHover={{ scale: 1.05 }}>
-      <Avatar className={cn(sizeClass[size], "ring-2 ring-white dark:ring-gray-800")}>
+    <motion.div 
+      whileHover={{ scale: 1.05 }} 
+      className="rounded-full shadow-md"
+    >
+      <Avatar className={cn(sizeClass[size], "ring-2 ring-white/80 dark:ring-gray-800/80")}>
         {imageUrl && <AvatarImage src={imageUrl} alt={fullName} />}
         <AvatarFallback className={cn(avatarColor, "font-medium text-white")}>
           {getInitials(fullName)}

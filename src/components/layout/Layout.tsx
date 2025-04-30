@@ -23,7 +23,7 @@ const Layout = ({
   showFAB = false
 }: LayoutProps) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-900">
       <Header 
         title={title} 
         showBackButton={showBackButton} 
@@ -35,7 +35,7 @@ const Layout = ({
         className="flex-1 pb-24 px-3 sm:px-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.4 }}
       >
         <div className="mx-auto max-w-screen-lg pt-4">
           {children}
@@ -50,9 +50,9 @@ const Layout = ({
             <TooltipTrigger asChild>
               <motion.button 
                 aria-label="Nouveau résumé"
-                className="fixed bottom-[84px] right-6 w-16 h-16 rounded-full shadow-lg bg-gradient-to-r from-blue-500 to-blue-700 text-white z-40 flex items-center justify-center"
+                className="fixed bottom-[84px] right-6 w-16 h-16 rounded-full shadow-lg bg-gradient-to-br from-nexentry-purple to-nexentry-purple-vivid text-white z-40 flex items-center justify-center"
                 onClick={() => window.location.href = '/record'}
-                whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(30, 58, 138, 0.3)" }}
+                whileHover={{ scale: 1.08, boxShadow: "0 15px 30px rgba(155, 135, 245, 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ y: 100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -64,7 +64,7 @@ const Layout = ({
                 </svg>
               </motion.button>
             </TooltipTrigger>
-            <TooltipContent side="left">
+            <TooltipContent side="left" className="bg-nexentry-purple text-white border-none shadow-lg">
               <p>Nouveau résumé</p>
             </TooltipContent>
           </Tooltip>
