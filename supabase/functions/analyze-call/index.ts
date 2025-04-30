@@ -56,9 +56,9 @@ serve(async (req) => {
       );
     }
     
-    const { transcript, clientName, duration, context } = requestData;
+    const { transcript, clientName, duration, context, messageType = 'email' } = requestData;
     
-    console.log(`Analyse d'un appel pour le client: ${clientName}, durée: ${duration}`);
+    console.log(`Analyse d'un message pour le client: ${clientName}, type: ${messageType}`);
     console.log(`Clé API OpenAI présente: ${openAIApiKey ? 'Oui' : 'Non'}`);
     console.log(`Longueur de la clé API: ${openAIApiKey?.length || 0} caractères`);
     console.log(`Transcription reçue (longueur): ${transcript?.length || 0} caractères`);
@@ -86,34 +86,48 @@ serve(async (req) => {
       );
     }
     
-    // Créer un prompt adapté pour l'analyse d'appel
-    const prompt = `
-Tu es un assistant de vente et de service client professionnel. Tu dois analyser cet appel téléphonique et fournir:
-1. Un résumé concis (maximum 3 phrases)
-2. Les points clés abordés (maximum 5 points)
-3. Des tags pertinents (maximum 4)
-4. Une suggestion d'email de suivi formaté et personnalisé
+    // Créer un prompt adapté selon le type de message demandé
+    let prompt = '';
+    
+    if (messageType === 'sms') {
+      prompt = `
+Tu es un assistant de vente et de service client professionnel. Tu dois analyser ce message vocal et créer:
+1. Un SMS concis et professionnel (maximum 160 caractères)
 
-Informations sur l'appel:
+Informations:
 - Client: ${clientName}
-- Durée: ${duration} secondes
 ${context ? `- Contexte: ${context}` : ''}
 
-Voici la transcription de l'appel:
+Voici la transcription du message vocal:
 ${transcript}
 
 Réponds en français au format JSON avec la structure suivante:
 {
-  "summary": "résumé concis de 2-3 phrases",
-  "key_points": ["point 1", "point 2", ...],
-  "tags": ["tag1", "tag2", ...],
+  "sms_content": "contenu du SMS adapté aux besoins exprimés dans la transcription (max 160 caractères)"
+}
+`;
+    } else {
+      prompt = `
+Tu es un assistant de vente et de service client professionnel. Tu dois analyser ce message vocal et créer:
+1. Un email de suivi formaté et personnalisé, adapté au contenu du message vocal.
+
+Informations:
+- Client: ${clientName}
+${context ? `- Contexte: ${context}` : ''}
+
+Voici la transcription du message vocal:
+${transcript}
+
+Réponds en français au format JSON avec la structure suivante:
+{
   "follow_up_email": {
     "subject": "Objet de l'email",
     "body": "Corps de l'email"
   }
 }
 `;
-
+    }
+    
     try {
       console.log('Préparation de l\'appel à l\'API OpenAI');
       console.log('Modèle utilisé: gpt-4o-mini');
@@ -123,7 +137,7 @@ Réponds en français au format JSON avec la structure suivante:
       const timeout = setTimeout(() => {
         console.log('Timeout de la requête OpenAI déclenché');
         controller.abort();
-      }, 25000); // 25 secondes de timeout - reduire pour éviter les timeouts côté client
+      }, 25000); // 25 secondes de timeout
       
       console.log('Envoi de la requête à l\'API OpenAI');
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -133,13 +147,13 @@ Réponds en français au format JSON avec la structure suivante:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini', // Modèle recommandé pour ce type d'analyse
+          model: 'gpt-4o-mini', 
           messages: [
-            { role: 'system', content: 'Tu es un assistant spécialisé dans l\'analyse d\'appels commerciaux qui génère du contenu en français.' },
+            { role: 'system', content: 'Tu es un assistant spécialisé dans la création de messages professionnels qui génère du contenu en français.' },
             { role: 'user', content: prompt }
           ],
-          temperature: 0.5, // Réduire légèrement la température pour des réponses plus consistantes
-          max_tokens: 800, // Limiter la longueur de la réponse pour améliorer la rapidité
+          temperature: 0.5,
+          max_tokens: 800,
         }),
         signal: controller.signal
       });
@@ -193,14 +207,17 @@ Réponds en français au format JSON avec la structure suivante:
       console.log('Contenu généré (début):', content.substring(0, 100) + '...');
       
       // Analyser le contenu JSON
-      let analysisResult;
+      let result;
       try {
-        analysisResult = JSON.parse(content);
+        result = JSON.parse(content);
         console.log('Analyse JSON réussie');
         
-        // Vérifier la structure du résultat
-        if (!analysisResult.summary || !analysisResult.key_points || !analysisResult.tags || !analysisResult.follow_up_email) {
-          console.error('Structure JSON incomplète dans la réponse OpenAI');
+        // Vérifier la structure du résultat selon le type de message
+        if (messageType === 'sms' && !result.sms_content) {
+          console.error('Structure JSON incomplète dans la réponse OpenAI (sms_content manquant)');
+          throw new Error('Structure JSON incomplète');
+        } else if (messageType === 'email' && (!result.follow_up_email || !result.follow_up_email.subject || !result.follow_up_email.body)) {
+          console.error('Structure JSON incomplète dans la réponse OpenAI (follow_up_email incomplet)');
           throw new Error('Structure JSON incomplète');
         }
       } catch (e) {
@@ -210,7 +227,7 @@ Réponds en français au format JSON avec la structure suivante:
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {
-            analysisResult = JSON.parse(jsonMatch[0]);
+            result = JSON.parse(jsonMatch[0]);
             console.log('Analyse JSON de secours réussie');
           } catch (e2) {
             console.error('Deuxième tentative de parsing échouée:', e2);
@@ -224,7 +241,7 @@ Réponds en français au format JSON avec la structure suivante:
       // Retourner les résultats
       console.log('Analyse terminée avec succès, envoi de la réponse');
       return new Response(
-        JSON.stringify(analysisResult),
+        JSON.stringify(result),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
 

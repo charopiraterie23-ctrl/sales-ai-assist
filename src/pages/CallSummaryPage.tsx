@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Calendar, Clock, Edit, Copy, SendHorizontal, User, Building, Tag } from 'lucide-react';
+import { Calendar, Clock, Edit, Copy, SendHorizontal, User, Building, Tag, Mic, MessageSquare } from 'lucide-react';
 import { formatDuration, formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
@@ -10,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import Layout from '@/components/layout/Layout';
 import { toast } from 'sonner';
-import { AnalysisResult } from '@/api/aiApi';
+import { AnalysisResult, generateEmailFromVoice } from '@/api/aiApi';
+import VoiceMessageInput from '@/components/voice/VoiceMessageInput';
 
 const CallSummaryPage = () => {
   const navigate = useNavigate();
@@ -148,6 +148,51 @@ const CallSummaryPage = () => {
     
     toast.success("Email envoyé avec succès");
     navigate("/calls");
+  };
+
+  const handleVoiceToEmail = async (transcript: string) => {
+    try {
+      toast.info("Génération de l'email en cours...");
+      const result = await generateEmailFromVoice(transcript, callData.clientName, 'email');
+      
+      if (result && result.subject && result.body) {
+        setEmailSubject(result.subject);
+        setEmailBody(result.body);
+        
+        // Change to email tab
+        setActiveTab("email");
+        
+        toast.success("Email généré à partir de votre message vocal");
+      } else {
+        toast.error("Échec de la génération de l'email");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la génération de l'email:", error);
+      toast.error("Impossible de générer l'email. Veuillez réessayer plus tard.");
+    }
+  };
+  
+  const handleVoiceToSMS = async (transcript: string) => {
+    try {
+      toast.info("Génération du SMS en cours...");
+      const result = await generateEmailFromVoice(transcript, callData.clientName, 'sms');
+      
+      if (result && result.body) {
+        // For SMS, we only need the body but display it in the email tab
+        setEmailSubject("SMS à " + callData.clientName);
+        setEmailBody(result.body);
+        
+        // Change to email tab
+        setActiveTab("email");
+        
+        toast.success("SMS généré à partir de votre message vocal");
+      } else {
+        toast.error("Échec de la génération du SMS");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la génération du SMS:", error);
+      toast.error("Impossible de générer le SMS. Veuillez réessayer plus tard.");
+    }
   };
 
   if (loadError) {
@@ -318,6 +363,23 @@ const CallSummaryPage = () => {
           
           <TabsContent value="email" className="pt-4">
             <div className="nexentry-card space-y-4">
+              {/* Voice Input Options */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                <VoiceMessageInput 
+                  onMessageReady={handleVoiceToEmail}
+                  title="Dicter un email"
+                  description="Enregistrez un message vocal pour générer un email de suivi"
+                  buttonText="Dicter un email"
+                />
+                
+                <VoiceMessageInput 
+                  onMessageReady={handleVoiceToSMS}
+                  title="Dicter un SMS"
+                  description="Enregistrez un message vocal pour générer un SMS concis"
+                  buttonText="Dicter un SMS"
+                />
+              </div>
+              
               <div className="space-y-2">
                 <label className="text-sm font-medium">Objet</label>
                 <input

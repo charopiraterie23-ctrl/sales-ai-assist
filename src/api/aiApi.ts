@@ -113,3 +113,73 @@ export const analyzeCallTranscript = async (
     throw error; // Propager l'erreur pour permettre une gestion au niveau supérieur
   }
 };
+
+export const generateEmailFromVoice = async (
+  voiceTranscript: string,
+  clientName: string,
+  emailType: 'email' | 'sms' = 'email'
+): Promise<{subject?: string, body: string}> => {
+  try {
+    console.log(`Génération de ${emailType} à partir d'un enregistrement vocal`);
+    
+    if (!voiceTranscript || voiceTranscript.trim() === '') {
+      toast.error("La transcription est vide. Impossible de générer un message.");
+      throw new Error("Transcription vide");
+    }
+
+    const { data, error } = await supabase.functions.invoke('analyze-call', {
+      body: {
+        transcript: voiceTranscript,
+        clientName,
+        duration: 60, // Durée fictive de 60 secondes
+        context: `Générer un ${emailType === 'email' ? 'email' : 'SMS'} uniquement`,
+        messageType: emailType
+      }
+    });
+
+    if (error) {
+      console.error('Erreur Supabase lors de l\'analyse vocale:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.error('Aucune donnée reçue de la fonction analyze-call');
+      toast.error("Aucune donnée reçue de l'analyse. Veuillez réessayer.");
+      throw new Error("Aucune donnée reçue");
+    }
+    
+    // Vérifier si la réponse contient une erreur
+    if (data.error) {
+      console.error('Erreur retournée par l\'API:', data);
+      throw { 
+        message: data.error,
+        errorType: data.errorType,
+        details: data.details
+      };
+    }
+    
+    if (emailType === 'email' && data.follow_up_email) {
+      return {
+        subject: data.follow_up_email.subject,
+        body: data.follow_up_email.body
+      };
+    } else {
+      // Pour les SMS, on ne retourne que le corps
+      return {
+        body: emailType === 'email' 
+          ? data.follow_up_email?.body || "Contenu de l'email non généré."
+          : data.sms_content || "Contenu du SMS non généré."
+      };
+    }
+  } catch (error) {
+    console.error('Erreur détaillée lors de l\'analyse vocale:', error);
+    
+    if (error.message) {
+      toast.error(`Erreur lors de la génération du message: ${error.message}`);
+    } else {
+      toast.error("Erreur lors de la génération du message. Veuillez réessayer plus tard.");
+    }
+    
+    throw error;
+  }
+};

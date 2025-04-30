@@ -1,7 +1,6 @@
-
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Loader2, AlertTriangle, User, Users, Briefcase } from 'lucide-react';
+import { Mic, Loader2, AlertTriangle, User, Users, Briefcase, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import Layout from '@/components/layout/Layout';
 import { toast } from 'sonner';
 import { analyzeCallTranscript } from '@/api/aiApi';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import VoiceRecorder from '@/components/voice/VoiceRecorder';
 
 const RecordPage = () => {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ const RecordPage = () => {
   const [duration, setDuration] = useState(15); // Default 15 minutes
   const [error, setError] = useState<string | null>(null);
   const [retries, setRetries] = useState(0);
+  const [useVoiceInput, setUseVoiceInput] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +65,12 @@ const RecordPage = () => {
         setError(error.message || "Une erreur est survenue lors de la création du résumé");
         setIsProcessing(false);
       });
+  };
+
+  const handleVoiceTranscript = (transcript: string) => {
+    setNotes(transcript);
+    setUseVoiceInput(false);
+    toast.success("Transcription ajoutée aux notes");
   };
 
   return (
@@ -188,13 +195,49 @@ const RecordPage = () => {
               </div>
               
               <div className="nexentry-card">
-                <h3 className="font-medium mb-3">Notes de l'échange</h3>
-                <Textarea
-                  placeholder="Décrivez les points importants de votre échange..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="min-h-[150px]"
-                />
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-medium">Notes de l'échange</h3>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1"
+                    onClick={() => setUseVoiceInput(!useVoiceInput)}
+                  >
+                    {useVoiceInput ? (
+                      <>
+                        <MessageSquare size={16} />
+                        <span>Saisir du texte</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic size={16} />
+                        <span>Utiliser ma voix</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+                
+                {useVoiceInput ? (
+                  <div className="py-4">
+                    <VoiceRecorder onTranscriptReady={handleVoiceTranscript} className="mb-4" />
+                    
+                    {notes && (
+                      <div className="mt-4 bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
+                        <p className="text-sm font-medium mb-1">Transcription:</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{notes}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Textarea
+                    placeholder="Décrivez les points importants de votre échange..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    className="min-h-[150px]"
+                  />
+                )}
               </div>
               
               <Alert className="bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800">
