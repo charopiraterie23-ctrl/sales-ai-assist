@@ -1,7 +1,10 @@
 
 import React from 'react';
-import { SettingsIcon } from 'lucide-react';
+import { SettingsIcon, Moon, Sun } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { useTheme } from '@/context/ThemeContext';
 
 interface PreferencesSectionProps {
   aiTone: string;
@@ -20,8 +23,10 @@ const PreferencesSection = ({
   summaryStructure,
   setSummaryStructure
 }: PreferencesSectionProps) => {
+  const { theme, setTheme } = useTheme();
+  
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <h2 className="text-xl font-semibold mb-4 flex items-center">
         <SettingsIcon className="mr-2" /> Préférences IA
       </h2>
@@ -63,6 +68,19 @@ const PreferencesSection = ({
               <SelectItem value="detailed">Résumé détaillé</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sun className="h-4 w-4" />
+            <Label htmlFor="dark-mode">Mode sombre</Label>
+            <Moon className="h-4 w-4" />
+          </div>
+          <Switch
+            id="dark-mode"
+            checked={theme === 'dark'}
+            onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+          />
         </div>
       </div>
     </div>

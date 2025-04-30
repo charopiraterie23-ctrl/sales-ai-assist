@@ -1,103 +1,61 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import RecordPage from "./pages/RecordPage";
-import CallSummaryPage from "./pages/CallSummaryPage";
-import ClientsPage from "./pages/ClientsPage";
-import AddClientPage from "./pages/AddClientPage";
-import ClientDetailsPage from "./pages/ClientDetailsPage";
-import EditClientPage from "./pages/EditClientPage";
-import CallsPage from "./pages/CallsPage";
-import DashboardPage from "./pages/DashboardPage";
-import DailyActionsPage from "./pages/DailyActionsPage";
-import PricingPage from "./pages/PricingPage";
-import SearchPage from "./pages/SearchPage";
-import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import SettingsPage from "./pages/SettingsPage";
 
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from './components/ui/sonner';
+
+// Import your pages
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import DashboardPage from './pages/DashboardPage';
+import ClientsPage from './pages/ClientsPage';
+import SettingsPage from './pages/SettingsPage';
+import NotFound from './pages/NotFound';
+import CallsPage from './pages/CallsPage';
+import CallSummaryPage from './pages/CallSummaryPage';
+import AddClientPage from './pages/AddClientPage';
+import EditClientPage from './pages/EditClientPage';
+import ClientDetailsPage from './pages/ClientDetailsPage';
+import DailyActionsPage from './pages/DailyActionsPage';
+import RecordPage from './pages/RecordPage';
+import SearchPage from './pages/SearchPage';
+import PricingPage from './pages/PricingPage';
+import Index from './pages/Index';
+
+// Create a client
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
+function App() {
+  return (
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={<Index />} />
+            <Route path="/home" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/clients/add" element={<AddClientPage />} />
+            <Route path="/clients/:id/edit" element={<EditClientPage />} />
+            <Route path="/clients/:id" element={<ClientDetailsPage />} />
+            <Route path="/calls" element={<CallsPage />} />
+            <Route path="/calls/:id" element={<CallSummaryPage />} />
+            <Route path="/daily-actions" element={<DailyActionsPage />} />
+            <Route path="/record" element={<RecordPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/record" element={
-              <ProtectedRoute>
-                <RecordPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/call-summary/:id" element={
-              <ProtectedRoute>
-                <CallSummaryPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/clients" element={
-              <ProtectedRoute>
-                <ClientsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/add-client" element={
-              <ProtectedRoute>
-                <AddClientPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/client/:id" element={
-              <ProtectedRoute>
-                <ClientDetailsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/client/:id/edit" element={
-              <ProtectedRoute>
-                <EditClientPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/calls" element={
-              <ProtectedRoute>
-                <CallsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/daily-actions" element={
-              <ProtectedRoute>
-                <DailyActionsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/search" element={
-              <ProtectedRoute>
-                <SearchPage />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+          <Toaster />
+        </Router>
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
+}
 
 export default App;
