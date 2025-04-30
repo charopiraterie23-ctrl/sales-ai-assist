@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, FileText, ChevronUp } from 'lucide-react';
+import { Home, Users, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -88,17 +88,6 @@ const MobileNavbar = () => {
                 )}
               </Link>
             ))}
-          </div>
-          
-          <div className="absolute -top-5 left-1/2 transform -translate-x-1/2">
-            <motion.div
-              whileTap={{ scale: 0.9 }}
-              whileHover={{ scale: 1.1, y: -2 }}
-              className="bg-gradient-to-r from-nexentry-blue to-nexentry-blue-vivid text-white p-3 rounded-full shadow-lg"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            >
-              <ChevronUp size={20} />
-            </motion.div>
           </div>
         </motion.nav>
       )}
