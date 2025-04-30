@@ -10,7 +10,7 @@ interface LogoutSectionProps {
 
 const LogoutSection = ({ signOut }: LogoutSectionProps) => {
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <Button 
         variant="destructive" 
         className="w-full" 
@@ -21,7 +21,7 @@ const LogoutSection = ({ signOut }: LogoutSectionProps) => {
       >
         <LogOut className="mr-2" /> Se déconnecter
       </Button>
-      <p className="text-sm text-gray-500 mt-2 text-center">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 text-center">
         Vous pouvez vous reconnecter à tout moment.
       </p>
     </div>
