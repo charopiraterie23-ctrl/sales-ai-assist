@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, Loader2, X, ArrowDown, ArrowUp } from 'lucide-react';
@@ -55,7 +54,6 @@ const ClientsPage = () => {
   const [sortType, setSortType] = useState<string>('lastContacted');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [clientCount, setClientCount] = useState<number>(123); // Simulated count for demo
-  const [freeQuota, setFreeQuota] = useState<number>(150); // Simulated quota limit
   
   // Mock data for clients
   const clients = [
@@ -214,7 +212,7 @@ const ClientsPage = () => {
           {/* Filter chips with horizontal scroll */}
           <div className="relative">
             <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent dark:from-gray-900 z-10" />
-            <ScrollArea orientation="horizontal" className="w-full pb-2">
+            <ScrollArea className="w-full pb-2">
               <div className="flex gap-2 py-2 px-1">
                 {filterOptions.map((status) => (
                   <Badge
@@ -400,29 +398,15 @@ const ClientsPage = () => {
         )}
       </div>
       
-      {/* Custom FAB with counter */}
-      {clientCount > 0 && (
-        <div className="fixed bottom-[96px] right-6 z-40">
-          {clientCount > freeQuota * 0.8 && (
-            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 font-medium">
-              {clientCount}/{freeQuota}
-            </div>
-          )}
-          <Button 
-            size="icon"
-            aria-label="Nouveau client"
-            className="w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white hover:bg-blue-600 transition-colors"
-            onClick={() => navigate('/add-client')}
-          >
-            <Plus size={24} />
-          </Button>
-          {clientCount > freeQuota * 0.8 && (
-            <div className="absolute top-16 right-0 bg-white dark:bg-gray-800 shadow-md rounded-md px-3 py-2 text-xs whitespace-nowrap">
-              Passez Pro pour illimité
-            </div>
-          )}
-        </div>
-      )}
+      {/* Custom FAB without quota counter */}
+      <Button 
+        size="icon"
+        aria-label="Nouveau client"
+        className="fixed bottom-[96px] right-6 z-40 w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white hover:bg-blue-600 transition-colors"
+        onClick={() => navigate('/add-client')}
+      >
+        <Plus size={24} />
+      </Button>
     </Layout>
   );
 };
