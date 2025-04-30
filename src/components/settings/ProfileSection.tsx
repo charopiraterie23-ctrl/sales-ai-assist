@@ -40,13 +40,13 @@ const ProfileSection = ({
     .toUpperCase();
 
   return (
-    <div className="bg-gray-950/30 backdrop-blur-md border border-gray-800/40 rounded-xl p-6 text-white">
+    <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800/40 rounded-xl p-6 text-white">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold text-white">Profil personnel</h2>
         <Button
           onClick={handleEditToggle}
           variant="outline"
-          className={`${isEditing ? 'bg-nexentry-blue text-white' : 'bg-gray-900 text-white border-gray-700'}`}
+          className={`${isEditing ? 'bg-nexentry-blue text-white border-nexentry-blue/40' : 'bg-gray-800 text-white border-gray-700'}`}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -61,7 +61,7 @@ const ProfileSection = ({
       <div className="space-y-4">
         <div className="flex items-center space-x-4 mb-4">
           <div className="relative" onClick={isEditing ? handleAvatarClick : undefined}>
-            <Avatar className={`h-16 w-16 bg-gray-800 border-2 border-nexentry-blue ${isEditing ? 'cursor-pointer hover:opacity-80' : ''}`}>
+            <Avatar className={`h-16 w-16 bg-gray-800 border-2 border-nexentry-blue/70 ${isEditing ? 'cursor-pointer hover:opacity-80' : ''}`}>
               <AvatarImage src={profile.avatar_url || ''} alt={profile.full_name} />
               <AvatarFallback className="bg-gray-800 text-white">{initials}</AvatarFallback>
               {isEditing && (

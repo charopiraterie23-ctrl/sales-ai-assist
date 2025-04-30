@@ -10,10 +10,10 @@ interface LogoutSectionProps {
 
 const LogoutSection = ({ signOut }: LogoutSectionProps) => {
   return (
-    <div className="bg-white shadow rounded-lg p-6">
+    <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800/40 rounded-xl p-6 text-white">
       <Button 
         variant="destructive" 
-        className="w-full" 
+        className="w-full bg-red-900/60 hover:bg-red-800" 
         onClick={() => {
           signOut();
           toast.success('Vous êtes maintenant déconnecté');
@@ -21,7 +21,7 @@ const LogoutSection = ({ signOut }: LogoutSectionProps) => {
       >
         <LogOut className="mr-2" /> Se déconnecter
       </Button>
-      <p className="text-sm text-gray-500 mt-2 text-center">
+      <p className="text-sm text-gray-400 mt-2 text-center">
         Vous pouvez vous reconnecter à tout moment.
       </p>
     </div>

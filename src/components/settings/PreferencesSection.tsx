@@ -26,7 +26,7 @@ const PreferencesSection = ({
   const { theme, setTheme } = useTheme();
   
   return (
-    <div className="bg-gray-950/30 backdrop-blur-md border border-gray-800/40 rounded-xl p-6 text-white">
+    <div className="bg-gray-900/60 backdrop-blur-md border border-gray-800/40 rounded-xl p-6 text-white">
       <h2 className="text-xl font-semibold mb-6 flex items-center">
         <SettingsIcon className="mr-2 text-gray-400" /> Préférences IA
       </h2>

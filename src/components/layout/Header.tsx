@@ -22,7 +22,7 @@ const Header = ({ title, showBackButton = false, onBackClick, className }: Heade
   };
   
   return (
-    <header className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-950/90 backdrop-blur-xl border-b border-gray-100/50 dark:border-gray-800/50 px-4 py-4 ${className ?? ''}`}>
+    <header className={`sticky top-0 z-50 w-full bg-gray-900/80 dark:bg-gray-950/90 backdrop-blur-xl border-b border-gray-800/30 dark:border-gray-800/30 px-4 py-4 ${className ?? ''}`}>
       <div className="flex items-center justify-between max-w-6xl mx-auto">
         <div className="flex items-center space-x-3">
           {showBackButton && (
@@ -59,7 +59,7 @@ const Header = ({ title, showBackButton = false, onBackClick, className }: Heade
             className="relative w-10 h-10 flex items-center justify-center rounded-full bg-gray-800 text-white shadow-sm"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-gray-950 animate-pulse-soft"></span>
+            <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-gray-900 animate-pulse-soft"></span>
           </motion.button>
           
           <ThemeToggle />

@@ -25,12 +25,12 @@ const Layout = ({
   className = ""
 }: LayoutProps) => {
   return (
-    <div className={`flex flex-col min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 ${className}`}>
+    <div className={`flex flex-col min-h-screen bg-gradient-to-br from-gray-950 to-gray-900 dark:from-gray-950 dark:to-gray-900 ${className}`}>
       <Header 
         title={title} 
         showBackButton={showBackButton} 
         onBackClick={onBackClick} 
-        className="sticky top-0 z-20 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl"
+        className="sticky top-0 z-20"
       />
       
       <motion.main 
