@@ -29,6 +29,7 @@ const Layout = ({
         title={title} 
         showBackButton={showBackButton} 
         onBackClick={onBackClick} 
+        className="sticky top-0 z-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
       />
       
       <main className="flex-1 pb-20">
@@ -46,7 +47,7 @@ const Layout = ({
               <Button 
                 size="icon"
                 aria-label="Nouveau résumé"
-                className="fixed bottom-[88px] right-6 w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white z-40 hover:bg-blue-600 transition-colors"
+                className="fixed bottom-[84px] right-6 w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white z-40 hover:bg-blue-600 transition-colors"
                 onClick={() => window.location.href = '/record'}
               >
                 <Plus size={24} />
