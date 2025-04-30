@@ -46,8 +46,9 @@ serve(async (req: Request) => {
     // For this example, we'll use hardcoded plans
     const plans = {
       '1': { name: 'Essai Pro', stripeProductId: 'prod_trial_pro', trialDays: 7 },
-      '2': { name: 'Pro', stripeProductId: 'prod_pro', trialDays: 0 },
-      '3': { name: 'Team', stripeProductId: 'prod_team', trialDays: 0 }
+      '2': { name: 'Pro', stripeProductId: 'prod_pro', trialDays: 7 },
+      '3': { name: 'Team', stripeProductId: 'prod_team', trialDays: 0 },
+      '4': { name: 'Entreprise', stripeProductId: 'prod_enterprise', trialDays: 0 }
     };
 
     const plan = plans[planId as keyof typeof plans];
@@ -67,7 +68,13 @@ serve(async (req: Request) => {
       mode: 'subscription',
       subscription_data: plan.trialDays ? { trial_period_days: plan.trialDays } : undefined,
       success_url: `${req.headers.get('origin')}/app?welcome`,
-      cancel_url: `${req.headers.get('origin')}/pricing`
+      cancel_url: `${req.headers.get('origin')}/pricing`,
+      payment_method_types: ['card'],
+      billing_address_collection: 'required',
+      locale: 'fr-CA',
+      metadata: {
+        company_location: 'Montréal, Canada'
+      }
     });
 
     // Return the session URL

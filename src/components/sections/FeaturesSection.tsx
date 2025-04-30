@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Mic, Mail, Users, Send } from "lucide-react";
+import { Mic, Mail, Users, Send, MessageSquare } from "lucide-react";
 import FeatureCard from "@/components/cards/FeatureCard";
 
 const FeaturesSection = () => {
@@ -24,14 +24,14 @@ const FeaturesSection = () => {
             description="Emails de suivi rédigés par l'IA basés sur la conversation."
           />
           <FeatureCard
-            icon={<Users className="w-10 h-10 text-blue-600" />}
-            title="Gestion de clients simplifiée"
-            description="Organisez tous vos prospects et clients au même endroit."
+            icon={<MessageSquare className="w-10 h-10 text-blue-600" />}
+            title="Relances SMS automatisées"
+            description="SMS de suivi générés par l'IA adaptés à vos échanges."
           />
           <FeatureCard
-            icon={<Send className="w-10 h-10 text-blue-600" />}
-            title="Envoi direct via Gmail / Outlook"
-            description="Intégration avec votre compte email professionnel."
+            icon={<Users className="w-10 h-10 text-blue-600" />}
+            title="Pour tous types d'entreprises"
+            description="Solution adaptée à tous secteurs professionnels."
           />
         </div>
       </div>

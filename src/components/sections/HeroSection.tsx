@@ -32,7 +32,7 @@ const HeroSection = () => {
           Repenser la façon dont vous <span className="bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">vendez.</span>
         </h1>
         <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          nexentry résume vos appels, génère vos relances, et optimise votre temps.
+          nexentry résume vos appels, génère vos relances par email et SMS, et optimise votre temps.
         </p>
         
         <div className="max-w-md mx-auto mb-4">

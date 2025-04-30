@@ -36,6 +36,15 @@ const plans = [
     features: ['Toutes les fonctions Pro', '15 utilisateurs inclus', 'Tableau admin'],
     ctaLabel: 'Démarrer Team',
     stripeProductId: 'prod_team',
+  },
+  {
+    id: '4',
+    name: 'Entreprise',
+    priceMonthly: null,
+    usersIncluded: null,
+    features: ['Déploiement personnalisé', 'API dédiée', 'Formation équipe', 'Support 24/7'],
+    ctaLabel: 'Contactez-nous',
+    stripeProductId: 'prod_enterprise',
   }
 ];
 
@@ -103,13 +112,21 @@ const PricingPage = () => {
                 Nous acceptons les principales cartes de crédit (Visa, Mastercard, American Express) ainsi que les paiements via PayPal.
               </AccordionContent>
             </AccordionItem>
+            <AccordionItem value="q4">
+              <AccordionTrigger className="text-left">
+                Les SMS sont-ils inclus dans tous les forfaits ?
+              </AccordionTrigger>
+              <AccordionContent>
+                La fonctionnalité d'envoi de SMS est disponible uniquement dans les forfaits Pro, Team et Entreprise. Le forfait Free ne permet que la création de résumés.
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </div>
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 flex justify-center md:hidden shadow-lg">
         <Button className="w-full bg-[#2166F0] hover:bg-blue-700" onClick={() => handleCheckout(plans[1])}>
-          14 jours d'essai gratuit — Sans engagement
+          7 jours d'essai gratuit — Sans engagement
         </Button>
       </div>
 

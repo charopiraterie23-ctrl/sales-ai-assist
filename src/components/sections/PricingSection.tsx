@@ -21,7 +21,7 @@ const PricingSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           <PricingCard
             title="Free"
-            price="0€"
+            price="0$"
             description="Pour tester l'expérience"
             features={[
               "Jusqu'à 3 résumés/mois",
@@ -34,29 +34,29 @@ const PricingSection = () => {
           />
           <PricingCard
             title="Pro"
-            price="19€"
-            badge="Le plus populaire"
+            price="19$"
+            badge="Essai gratuit 7 j"
             description="Pour les professionnels"
             features={[
               "Résumés illimités",
-              "Emails de suivi",
+              "Emails et SMS de suivi",
               "Contacts illimités",
               "Support prioritaire",
               "Partage des résumés"
             ]}
-            buttonText="Passer au Pro"
+            buttonText="Essai gratuit"
             onClick={() => handleButtonClick("/register")}
             highlight={true}
           />
           <PricingCard
-            title="Équipe"
-            price="199€"
-            description="Pour les équipes"
+            title="Entreprise"
+            price="Sur mesure"
+            description="Pour les grandes équipes"
             features={[
-              "Jusqu'à 10 membres",
-              "Suivi collaboratif",
-              "Analyses d'équipe",
-              "Support dédié"
+              "Déploiement personnalisé",
+              "API dédiée",
+              "Formation d'équipe",
+              "Support dédié 24/7"
             ]}
             buttonText="Contactez-nous"
             onClick={() => handleButtonClick("/contact")}

@@ -5,8 +5,8 @@ import PricingCard from '@/components/pricing/PricingCard';
 interface Plan {
   id: string;
   name: string;
-  priceMonthly: number;
-  usersIncluded: number;
+  priceMonthly: number | null;
+  usersIncluded: number | null;
   features: string[];
   ctaLabel: string;
   stripeProductId: string;
@@ -28,13 +28,13 @@ const PricingCardList: React.FC<PricingCardListProps> = ({
   const displayPlans = plans.filter(plan => plan.name !== 'Essai Pro');
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
       {displayPlans.map((plan) => (
         <PricingCard
           key={plan.id}
           title={plan.name === 'Team' ? `Team (≤ ${plan.usersIncluded} users)` : plan.name}
-          price={`${plan.priceMonthly} $`}
-          description={plan.name === 'Pro' ? '/ mois / utilisateur' : '/ mois'}
+          price={plan.priceMonthly !== null ? `${plan.priceMonthly} $` : 'Sur mesure'}
+          description={plan.name === 'Pro' ? '/ mois / utilisateur' : (plan.name === 'Entreprise' ? '' : '/ mois')}
           features={plan.features}
           buttonText={plan.ctaLabel}
           onClick={() => onSelectPlan(plan)}
