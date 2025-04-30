@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar } from 'lucide-react';
+import { Calendar, Mail, Phone, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface TodaySummaryCardProps {
@@ -39,39 +39,49 @@ const TodaySummaryCard: React.FC<TodaySummaryCardProps> = ({
   return (
     <Card className="animate-fade-in border shadow-md">
       <CardContent className="pt-4 pb-3">
-        <h3 className="text-lg font-semibold mb-3">Ma journée</h3>
+        <h3 className="text-base font-semibold mb-3">Ma journée</h3>
         
         <div className="grid grid-cols-3 gap-2 mb-4">
           <div 
             className="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
             onClick={() => handleKpiClick('calls')}
           >
-            <div className="text-2xl font-bold text-[#2166F0] mb-1">{pendingCallsToday}</div>
-            <div className="text-xs uppercase text-gray-600 dark:text-gray-400 tracking-wide">Appels</div>
-            {!isClickToCallEnabled && pendingCallsToday > 0 && (
-              <div className="text-[10px] text-gray-500 mt-1 px-1">Activez les appels sortants</div>
-            )}
+            <div className="flex flex-col items-center">
+              <Phone size={20} className="text-[#2166F0] mb-1" />
+              <div className="text-2xl font-bold text-[#2166F0]">{pendingCallsToday}</div>
+              <div className="text-xs uppercase text-gray-600 dark:text-gray-400 tracking-wide font-medium">À traiter</div>
+              {!isClickToCallEnabled && pendingCallsToday > 0 && (
+                <div className="text-[10px] text-gray-500 mt-1 px-1">Activez les appels sortants</div>
+              )}
+            </div>
           </div>
           
           <div 
             className="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
             onClick={() => handleKpiClick('emails')}
           >
-            <div className="text-2xl font-bold text-[#2166F0] mb-1">{readyEmails}</div>
-            <div className="text-xs uppercase text-gray-600 dark:text-gray-400 tracking-wide">E-mails</div>
+            <div className="flex flex-col items-center">
+              <Mail size={20} className="text-[#2166F0] mb-1" />
+              <div className="text-2xl font-bold text-[#2166F0]">{readyEmails}</div>
+              <div className="text-xs uppercase text-gray-600 dark:text-gray-400 tracking-wide font-medium">Prêts</div>
+            </div>
           </div>
           
           <div 
             className="text-center p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
             onClick={() => handleKpiClick('clients')}
           >
-            <div className="text-2xl font-bold text-[#2166F0] mb-1">{clientsToFollowUp}</div>
-            <div className="text-xs uppercase text-gray-600 dark:text-gray-400 tracking-wide">Clients</div>
+            <div className="flex flex-col items-center">
+              <Users size={20} className="text-[#2166F0] mb-1" />
+              <div className="text-2xl font-bold text-[#2166F0]">{clientsToFollowUp}</div>
+              <div className="text-xs uppercase text-gray-600 dark:text-gray-400 tracking-wide font-medium">À relancer</div>
+            </div>
           </div>
         </div>
         
         <Button 
-          className="w-full bg-[#2166F0] hover:bg-blue-600 text-white" 
+          variant="outline" 
+          className="w-full border-[#2166F0] text-[#2166F0] hover:bg-blue-50" 
           onClick={navigateToActions}
         >
           <Calendar className="h-4 w-4 mr-2" /> Voir mes actions du jour

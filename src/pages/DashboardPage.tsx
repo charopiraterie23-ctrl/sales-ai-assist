@@ -9,7 +9,8 @@ import { toast } from '@/components/ui/sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, Calendar, Link } from 'lucide-react';
+import { Calendar, Link } from 'lucide-react';
+import { Activity } from '@/components/dashboard/ActivityFeed';
 import ActivityFeed from '@/components/dashboard/ActivityFeed';
 import IntegrationsCard from '@/components/dashboard/IntegrationsCard';
 import TodaySummaryCard from '@/components/dashboard/TodaySummaryCard';
@@ -78,44 +79,28 @@ const DashboardPage = () => {
   
   if (isLoading || dashboardData.isLoadingData) {
     return (
-      <Layout title="Accueil" showNavbar={true} showFAB={false}>
+      <Layout title="Accueil" showNavbar={true} showFAB={true}>
         <DashboardLoading />
       </Layout>
     );
   }
 
   return (
-    <Layout title="Accueil" showNavbar={true} showFAB={false}>
-      <div className="space-y-4 pb-20">
+    <Layout title="Accueil" showNavbar={true} showFAB={true}>
+      <div className="space-y-6 pb-20">
         {/* Message de bienvenue avec minutes restantes */}
         <div className="animate-fade-in">
           <h1 className="text-2xl font-bold mb-1">
             Bonjour {profile?.full_name?.split(' ')[0] || 'utilisateur'} 👋
           </h1>
           <div className="flex justify-between items-center">
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               Prêt·e pour une journée productive ?
             </p>
             {showTrialBanner && (
               <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                 {trialMinutesRemaining} min audio restantes
               </span>
-            )}
-            {userPlan === 'pro' && (
-              <div className="flex items-center">
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
-                  Plan Pro actif
-                </span>
-                <Button 
-                  variant="link" 
-                  size="sm" 
-                  className="text-xs ml-1 p-0 h-auto"
-                  onClick={() => navigate('/settings?tab=billing')}
-                >
-                  Gérer
-                </Button>
-              </div>
             )}
           </div>
         </div>
@@ -137,17 +122,9 @@ const DashboardPage = () => {
           isClickToCallEnabled={false}
         />
 
-        {/* Bouton Nouveau résumé */}
-        <Button 
-          className="w-full py-6 text-lg rounded-3xl shadow-md bg-[#2166F0] hover:bg-blue-600 transition-all"
-          onClick={() => navigate('/record')}
-        >
-          <Plus className="mr-2" /> Nouveau résumé
-        </Button>
-
         {/* Section Fil d'activité */}
         <div className="pt-2">
-          <h2 className="text-lg font-semibold mb-2">Fil d'activité</h2>
+          <h2 className="text-base font-semibold mb-2">Fil d'activité</h2>
           <ScrollArea className="h-[38vh] rounded-2xl border">
             <ActivityFeed 
               isLoading={isActivityLoading}
@@ -179,7 +156,7 @@ const DashboardPage = () => {
 };
 
 // Sample activities for development
-const mockActivities = [
+const mockActivities: Activity[] = [
   {
     id: '1',
     title: 'Appel avec Jean Dupont',
@@ -218,4 +195,3 @@ const mockActivities = [
 ];
 
 export default DashboardPage;
-

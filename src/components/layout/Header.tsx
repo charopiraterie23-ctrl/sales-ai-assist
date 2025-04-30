@@ -18,7 +18,7 @@ const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => 
   };
   
   return (
-    <header className="sticky top-0 z-50 w-full bg-white dark:bg-[#111827] border-b border-gray-200 dark:border-gray-800 px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-[#111827]/80 border-b border-gray-200 dark:border-gray-800 px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.04)] backdrop-blur-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           {showBackButton && (
@@ -47,7 +47,7 @@ const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => 
           )}
           <h1 className="text-lg font-semibold text-[#111827] dark:text-white">{title}</h1>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
             size="icon" 

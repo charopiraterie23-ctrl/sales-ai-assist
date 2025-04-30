@@ -25,6 +25,9 @@ const UserMenu = () => {
     .map((n: string) => n[0])
     .join('')
     .toUpperCase();
+    
+  // Explicitement normaliser le plan pour éviter les problèmes de casse
+  const isPro = profile?.plan?.toLowerCase() === 'pro';
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -43,6 +46,19 @@ const UserMenu = () => {
             <p className="text-xs leading-none text-muted-foreground">
               {user.email}
             </p>
+            {isPro && (
+              <div className="flex items-center mt-1.5">
+                <span className="w-6 h-6 rounded-full bg-[#22C55E] text-white text-[10px] font-bold flex items-center justify-center">
+                  Pro
+                </span>
+                <Link 
+                  to="/settings?tab=billing" 
+                  className="text-[10px] text-blue-500 ml-2 hover:underline"
+                >
+                  Gérer mon abonnement
+                </Link>
+              </div>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
