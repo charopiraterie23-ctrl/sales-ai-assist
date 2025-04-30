@@ -1,11 +1,11 @@
 
-import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
-import { User, Building, Mail, Phone as PhoneIcon, Clock } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Building } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState, useRef } from 'react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import ClientAvatar from './ClientAvatar';
+import ClientStatusBadge from './ClientStatusBadge';
+import ClientContactInfo from './ClientContactInfo';
+import ClientSwipeActions from './ClientSwipeActions';
 
 interface ClientCardProps {
   clientId: string;
@@ -19,49 +19,6 @@ interface ClientCardProps {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
 }
-
-const statusColors = {
-  lead: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900 dark:text-blue-300',
-  intéressé: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-300',
-  'en attente': 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900 dark:text-yellow-300',
-  conclu: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900 dark:text-purple-300',
-  perdu: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900 dark:text-red-300',
-};
-
-// Function to generate a consistent color based on a name
-const generateAvatarColor = (name: string) => {
-  // Simple hash function
-  const hash = name.split('').reduce((acc, char) => {
-    return char.charCodeAt(0) + ((acc << 5) - acc);
-  }, 0);
-  
-  // Define a set of soft colors suitable for avatars
-  const colors = [
-    'bg-blue-200 text-blue-800',
-    'bg-green-200 text-green-800',
-    'bg-yellow-200 text-yellow-800',
-    'bg-purple-200 text-purple-800',
-    'bg-pink-200 text-pink-800',
-    'bg-indigo-200 text-indigo-800',
-    'bg-red-200 text-red-800',
-    'bg-orange-200 text-orange-800',
-    'bg-teal-200 text-teal-800',
-  ];
-  
-  // Use the hash to select a color
-  const colorIndex = Math.abs(hash) % colors.length;
-  return colors[colorIndex];
-};
-
-// Function to get initials from a name
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
-    .toUpperCase()
-    .substring(0, 2);
-};
 
 const ClientCard = ({
   clientId,
@@ -78,7 +35,6 @@ const ClientCard = ({
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
   const startX = useRef<number | null>(null);
-  const avatarColor = generateAvatarColor(fullName);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     startX.current = e.touches[0].clientX;
@@ -115,34 +71,6 @@ const ClientCard = ({
     setIsSwiping(false);
   };
 
-  // Render action buttons that appear during swipe
-  const renderSwipeActions = () => {
-    const leftAction = swipeOffset < 0 && (
-      <div 
-        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-green-500 text-white"
-        style={{ opacity: Math.min(Math.abs(swipeOffset) / 60, 1) }}
-      >
-        <PhoneIcon size={20} />
-      </div>
-    );
-
-    const rightAction = swipeOffset > 0 && (
-      <div 
-        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-blue-500 text-white"
-        style={{ opacity: Math.min(Math.abs(swipeOffset) / 60, 1) }}
-      >
-        <Mail size={20} />
-      </div>
-    );
-
-    return (
-      <>
-        {leftAction}
-        {rightAction}
-      </>
-    );
-  };
-
   return (
     <div 
       className="relative overflow-hidden"
@@ -150,7 +78,7 @@ const ClientCard = ({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {renderSwipeActions()}
+      <ClientSwipeActions swipeOffset={swipeOffset} />
       
       <div 
         className={cn(
@@ -161,16 +89,12 @@ const ClientCard = ({
         onClick={onClick}
       >
         <div className="flex items-start mb-2">
-          <Avatar className={cn("mr-3 h-10 w-10", avatarColor)}>
-            <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
-          </Avatar>
+          <ClientAvatar fullName={fullName} />
           
-          <div className="flex-1">
+          <div className="flex-1 ml-3">
             <div className="flex items-center flex-wrap gap-2">
               <h3 className="font-medium text-base">{fullName}</h3>
-              <Badge variant="outline" className={cn('rounded-full px-2 py-0.5 text-xs border', statusColors[status])}>
-                {status}
-              </Badge>
+              <ClientStatusBadge status={status} />
             </div>
             {company && (
               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
@@ -181,36 +105,11 @@ const ClientCard = ({
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
-          {email && phone && (
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
-              <Mail size={12} className="mr-1 flex-shrink-0" />
-              <span className="mr-1 truncate max-w-[150px]">{email}</span>
-              <span className="mx-1">•</span>
-              <PhoneIcon size={12} className="mr-1 flex-shrink-0" />
-              <span>{phone}</span>
-            </div>
-          )}
-          {email && !phone && (
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
-              <Mail size={12} className="mr-1 flex-shrink-0" />
-              <span className="truncate">{email}</span>
-            </div>
-          )}
-          {!email && phone && (
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
-              <PhoneIcon size={12} className="mr-1 flex-shrink-0" />
-              <span>{phone}</span>
-            </div>
-          )}
-        </div>
-        
-        {lastContacted && (
-          <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
-            <Clock size={12} className="mr-1" />
-            Dernier contact: {formatDistanceToNow(lastContacted, { addSuffix: true, locale: fr })}
-          </div>
-        )}
+        <ClientContactInfo 
+          email={email}
+          phone={phone}
+          lastContacted={lastContacted}
+        />
       </div>
     </div>
   );
