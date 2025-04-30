@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Users, FileText, Bell, ChevronUp } from 'lucide-react';
+import { Home, Users, FileText, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -45,11 +45,6 @@ const MobileNavbar = () => {
       label: 'Sessions',
       icon: <FileText size={22} />,
     },
-    {
-      path: '/notifications',
-      label: 'Notifs',
-      icon: <Bell size={22} />,
-    },
   ];
 
   return (
@@ -62,7 +57,7 @@ const MobileNavbar = () => {
           transition={{ duration: 0.3, ease: 'easeInOut' }}
           className="fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg border-t border-gray-100/50 dark:border-gray-800/50 px-4 py-3 z-50 shadow-lg rounded-t-3xl"
         >
-          <div className="grid grid-cols-4 gap-1 max-w-md mx-auto relative">
+          <div className="grid grid-cols-3 gap-1 max-w-md mx-auto relative">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -87,7 +82,7 @@ const MobileNavbar = () => {
                   <motion.div
                     layoutId="activeTabIndicator"
                     className="absolute bottom-0.5 rounded-full h-1 w-12 bg-white/30 dark:bg-white/30"
-                    style={{ left: `calc(25% * ${navItems.indexOf(item)} + 12.5% - 24px)` }}
+                    style={{ left: `calc(33.333% * ${navItems.indexOf(item)} + 16.666% - 24px)` }}
                     transition={{ type: "spring", duration: 0.5 }}
                   />
                 )}
