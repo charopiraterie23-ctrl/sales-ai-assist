@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, Filter, Loader2, X, ArrowDown, ArrowUp } from 'lucide-react';
@@ -23,15 +24,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
 import {
   Sheet,
   SheetContent,
@@ -187,14 +179,14 @@ const ClientsPage = () => {
 
   return (
     <Layout title="Clients" showFAB={false}>
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Sticky search and filters container */}
-        <div className="sticky top-[57px] z-10 bg-white dark:bg-gray-900 pt-1 pb-2">
-          <div className="relative mb-2">
+        <div className="sticky top-[57px] z-10 bg-white dark:bg-gray-900 pt-4 pb-3">
+          <div className="relative mb-3">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <Input
               placeholder="Rechercher un client..."
-              className="pl-9 pr-8"
+              className="pl-9 pr-8 py-5 h-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -213,12 +205,12 @@ const ClientsPage = () => {
           <div className="relative">
             <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent dark:from-gray-900 z-10" />
             <ScrollArea className="w-full pb-2">
-              <div className="flex gap-2 py-2 px-1">
+              <div className="flex gap-3 py-2 px-1">
                 {filterOptions.map((status) => (
                   <Badge
                     key={status}
                     variant={activeFilter === status ? "default" : "outline"}
-                    className="cursor-pointer py-0 h-8 px-3 whitespace-nowrap flex items-center gap-1.5"
+                    className="cursor-pointer py-0 h-8 px-4 whitespace-nowrap flex items-center gap-1.5"
                     onClick={() => setActiveFilter(status)}
                   >
                     {getChipLabel(status)}
@@ -239,48 +231,48 @@ const ClientsPage = () => {
           </div>
           
           {/* Filters and sort row */}
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center justify-between mt-3">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                <Button variant="outline" size="sm" className="flex items-center gap-2 h-9 px-4">
                   <Filter className="h-4 w-4" /> Filtres
                 </Button>
               </SheetTrigger>
               <SheetContent side="bottom" className="h-[70vh]">
-                <SheetHeader>
+                <SheetHeader className="pb-2">
                   <SheetTitle>Filtres avancés</SheetTitle>
                   <SheetDescription>
                     Affinez votre recherche avec des filtres supplémentaires.
                   </SheetDescription>
                 </SheetHeader>
-                <div className="py-4">
+                <div className="py-6">
                   <p className="text-sm text-gray-500">Options de filtrage à venir...</p>
                 </div>
                 <SheetFooter>
-                  <Button>Appliquer les filtres</Button>
+                  <Button className="w-full sm:w-auto">Appliquer les filtres</Button>
                 </SheetFooter>
               </SheetContent>
             </Sheet>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex items-center">
+                <Button variant="outline" size="sm" className="flex items-center gap-2 h-9 px-4">
                   Trier par
                   {sortDirection === 'asc' ? (
-                    <ArrowUp className="h-4 w-4 ml-1" />
+                    <ArrowUp className="h-4 w-4" />
                   ) : (
-                    <ArrowDown className="h-4 w-4 ml-1" />
+                    <ArrowDown className="h-4 w-4" />
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleSort('name')}>
+              <DropdownMenuContent align="end" className="min-w-[180px]">
+                <DropdownMenuItem onClick={() => handleSort('name')} className="gap-2 justify-between">
                   Nom {sortType === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort('lastContacted')}>
+                <DropdownMenuItem onClick={() => handleSort('lastContacted')} className="gap-2 justify-between">
                   Dernier contact {sortType === 'lastContacted' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSort('status')}>
+                <DropdownMenuItem onClick={() => handleSort('status')} className="gap-2 justify-between">
                   Statut {sortType === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -289,7 +281,7 @@ const ClientsPage = () => {
         </div>
         
         {isLoading ? (
-          <div className="space-y-3 animate-pulse">
+          <div className="space-y-4 px-1 animate-pulse">
             {[1, 2].map((i) => (
               <div key={i} className="p-4 rounded-lg border">
                 <div className="flex items-center space-x-4">
@@ -306,7 +298,7 @@ const ClientsPage = () => {
         ) : (
           <div>
             {paginatedClients.length > 0 ? (
-              <div className="space-y-3 animate-fade-in pb-20">
+              <div className="space-y-4 animate-fade-in pb-20 px-1">
                 {paginatedClients.map((client) => (
                   <ClientCard
                     key={client.clientId}
@@ -324,9 +316,9 @@ const ClientsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-10 animate-fade-in">
-                <div className="mx-auto max-w-xs mb-5 opacity-70">
-                  <svg viewBox="0 0 24 24" fill="none" className="h-40 w-40 mx-auto text-gray-300">
+              <div className="text-center py-14 animate-fade-in">
+                <div className="mx-auto max-w-xs mb-6 opacity-70">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-32 w-32 mx-auto text-gray-300">
                     <path
                       d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
                       stroke="currentColor"
@@ -350,13 +342,13 @@ const ClientsPage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="font-medium text-lg mb-2">Aucun contact pour le moment</h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-4 max-w-md mx-auto">
+                <h3 className="font-medium text-xl mb-3">Aucun contact pour le moment</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
                   {searchQuery || activeFilter !== 'all' 
                     ? "Aucun client ne correspond à votre recherche" 
                     : "Commencez par ajouter votre premier contact pour gérer votre relation client efficacement."}
                 </p>
-                <Button onClick={() => navigate('/add-client')}>
+                <Button size="lg" onClick={() => navigate('/add-client')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter votre premier contact
                 </Button>
@@ -365,7 +357,7 @@ const ClientsPage = () => {
             
             {/* Pagination component */}
             {sortedClients.length > itemsPerPage && (
-              <Pagination className="mt-6 pb-20">
+              <Pagination className="mt-8 pb-24">
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
@@ -402,7 +394,7 @@ const ClientsPage = () => {
       <Button 
         size="icon"
         aria-label="Nouveau client"
-        className="fixed bottom-[96px] right-6 z-40 w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white hover:bg-blue-600 transition-colors"
+        className="fixed bottom-[108px] right-6 z-40 w-14 h-14 rounded-full shadow-lg bg-[#2166F0] text-white hover:bg-blue-600 transition-colors"
         onClick={() => navigate('/add-client')}
       >
         <Plus size={24} />
