@@ -2,8 +2,7 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
-
-type ClientStatus = 'lead' | 'intéressé' | 'en attente' | 'conclu' | 'perdu' | 'all';
+import { ClientStatus } from '@/types/client';
 
 interface ClientFiltersProps {
   activeFilter: ClientStatus;
@@ -11,7 +10,7 @@ interface ClientFiltersProps {
 }
 
 const ClientFilters = ({ activeFilter, setActiveFilter }: ClientFiltersProps) => {
-  const filterOptions: ClientStatus[] = ['all', 'lead', 'intéressé', 'en attente', 'conclu', 'perdu'];
+  const filterOptions: ClientStatus[] = ['all', 'lead', 'intéressé', 'en attente', 'conclu', 'perdu', 'all'];
 
   const getChipLabel = (status: ClientStatus) => {
     return status === 'all' ? 'Tous' : status;

@@ -17,6 +17,7 @@ import AddClientFab from '@/components/clients/AddClientFab';
 import AdvancedFilterSheet from '@/components/clients/AdvancedFilterSheet';
 import { useClientData } from '@/hooks/useClientData';
 import { AnimatePresence } from 'framer-motion';
+import { ClientStatus } from '@/types/client';
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -59,6 +60,11 @@ const ClientsPage = () => {
     visible: { opacity: 1, y: 0 }
   };
 
+  // Add this handler function to safely convert string to ClientStatus
+  const handleTabChange = (value: string) => {
+    setActiveFilter(value as ClientStatus);
+  };
+
   return (
     <Layout title="Clients" showFAB={false}>
       <div className="space-y-5">
@@ -89,7 +95,7 @@ const ClientsPage = () => {
           </motion.div>
           
           <motion.div variants={itemVariants} className="mb-3">
-            <Tabs defaultValue={activeFilter} onValueChange={setActiveFilter} className="w-full">
+            <Tabs defaultValue={activeFilter} onValueChange={handleTabChange} className="w-full">
               <TabsList className="w-full bg-gray-50 dark:bg-gray-800 p-1 rounded-xl">
                 <TabsTrigger
                   value="all"
