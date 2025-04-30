@@ -18,7 +18,7 @@ export function ThemeToggle({ className, variant = "ghost", size = "icon" }: The
     <Button
       variant={variant}
       size={size}
-      className={`rounded-full bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 shadow-sm ${className || ''}`}
+      className={`rounded-full bg-gray-800 dark:bg-gray-800 text-gray-300 dark:text-gray-300 ${className || ''}`}
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
     >
       <motion.div
