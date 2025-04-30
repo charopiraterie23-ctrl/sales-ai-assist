@@ -1,18 +1,11 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { User, Building, Mail, Phone as PhoneIcon, Clock, MoreHorizontal, MessageSquare } from 'lucide-react';
+import { User, Building, Mail, Phone as PhoneIcon, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState, useRef } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface ClientCardProps {
   clientId: string;
@@ -23,6 +16,8 @@ interface ClientCardProps {
   lastContacted?: Date;
   status: 'lead' | 'intéressé' | 'en attente' | 'conclu' | 'perdu';
   onClick?: () => void;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
 }
 
 const statusColors = {
@@ -77,6 +72,8 @@ const ClientCard = ({
   lastContacted,
   status,
   onClick,
+  onSwipeLeft,
+  onSwipeRight
 }: ClientCardProps) => {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
@@ -106,40 +103,16 @@ const ClientCard = ({
     
     if (swipeOffset > threshold) {
       // Swipe right action - Follow up (email/SMS)
-      console.log('Follow up with client', clientId);
+      onSwipeRight && onSwipeRight();
     } else if (swipeOffset < -threshold) {
       // Swipe left action - Call
-      console.log('Call client', clientId);
+      onSwipeLeft && onSwipeLeft();
     }
     
     // Reset swipe state
     startX.current = null;
     setSwipeOffset(0);
     setIsSwiping(false);
-  };
-
-  const handleCall = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Calling client', clientId);
-    if (phone) {
-      window.open(`tel:${phone}`);
-    }
-  };
-
-  const handleMessage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Messaging client', clientId);
-  };
-
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Edit client', clientId);
-    window.location.href = `/edit-client/${clientId}`;
-  };
-
-  const handleArchive = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    console.log('Archive client', clientId);
   };
 
   // Render action buttons that appear during swipe
@@ -158,7 +131,7 @@ const ClientCard = ({
         className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-blue-500 text-white"
         style={{ opacity: Math.min(Math.abs(swipeOffset) / 60, 1) }}
       >
-        <MessageSquare size={20} />
+        <Mail size={20} />
       </div>
     );
 
@@ -187,13 +160,13 @@ const ClientCard = ({
         style={{ transform: `translateX(${swipeOffset}px)` }}
         onClick={onClick}
       >
-        <div className="flex items-start mb-3">
+        <div className="flex items-start mb-2">
           <Avatar className={cn("mr-3 h-10 w-10", avatarColor)}>
             <AvatarFallback>{getInitials(fullName)}</AvatarFallback>
           </Avatar>
           
           <div className="flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center flex-wrap gap-2">
               <h3 className="font-medium text-base">{fullName}</h3>
               <Badge variant="outline" className={cn('rounded-full px-2 py-0.5 text-xs border', statusColors[status])}>
                 {status}
@@ -206,49 +179,34 @@ const ClientCard = ({
               </div>
             )}
           </div>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="p-1 rounded-full hover:bg-gray-100" onClick={(e) => e.stopPropagation()}>
-                <MoreHorizontal size={18} className="text-gray-500" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={(e) => onClick && onClick()}>
-                Voir la fiche
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleEdit}>Modifier</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleCall} disabled={!phone}>
-                Appeler
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleMessage}>Envoyer un message</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleArchive} className="text-red-600">
-                Archiver
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-          {email && (
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-              <Mail size={14} className="mr-1 flex-shrink-0" />
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
+          {email && phone && (
+            <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
+              <Mail size={12} className="mr-1 flex-shrink-0" />
+              <span className="mr-1 truncate max-w-[150px]">{email}</span>
+              <span className="mx-1">•</span>
+              <PhoneIcon size={12} className="mr-1 flex-shrink-0" />
+              <span>{phone}</span>
+            </div>
+          )}
+          {email && !phone && (
+            <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
+              <Mail size={12} className="mr-1 flex-shrink-0" />
               <span className="truncate">{email}</span>
             </div>
           )}
-          
-          {phone && (
-            <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-              <PhoneIcon size={14} className="mr-1 flex-shrink-0" />
+          {!email && phone && (
+            <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
+              <PhoneIcon size={12} className="mr-1 flex-shrink-0" />
               <span>{phone}</span>
             </div>
           )}
         </div>
         
         {lastContacted && (
-          <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs mt-2">
+          <div className="flex items-center text-gray-500 dark:text-gray-400 text-xs">
             <Clock size={12} className="mr-1" />
             Dernier contact: {formatDistanceToNow(lastContacted, { addSuffix: true, locale: fr })}
           </div>

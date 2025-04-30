@@ -8,6 +8,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ClientCard from '@/components/cards/ClientCard';
 import Layout from '@/components/layout/Layout';
 import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Pagination, 
   PaginationContent, 
@@ -45,12 +47,15 @@ type ClientStatus = 'lead' | 'intéressé' | 'en attente' | 'conclu' | 'perdu' |
 
 const ClientsPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState<ClientStatus>('all');
   const [sortType, setSortType] = useState<string>('lastContacted');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [clientCount, setClientCount] = useState<number>(123); // Simulated count for demo
+  const [freeQuota, setFreeQuota] = useState<number>(150); // Simulated quota limit
   
   // Mock data for clients
   const clients = [
@@ -94,6 +99,10 @@ const ClientsPage = () => {
 
   const clearSearch = () => {
     setSearchQuery('');
+  };
+  
+  const resetFilter = () => {
+    setActiveFilter('all');
   };
 
   // Filter clients based on search query and active filter
@@ -156,13 +165,33 @@ const ClientsPage = () => {
       setSortDirection('desc');
     }
   };
+  
+  // Handle client actions
+  const handleCall = (clientId: string, name: string) => {
+    toast({
+      title: "Appel en cours",
+      description: `Appel vers ${name}...`,
+    });
+  };
+  
+  const handleMessage = (clientId: string, name: string) => {
+    toast({
+      title: "Suivi client",
+      description: `Préparation d'un message pour ${name}`,
+    });
+  };
 
   const filterOptions: ClientStatus[] = ['all', 'lead', 'intéressé', 'en attente', 'conclu', 'perdu'];
 
+  const getChipLabel = (status: ClientStatus) => {
+    return status === 'all' ? 'Tous' : status;
+  };
+
   return (
-    <Layout title="Clients" showFAB>
+    <Layout title="Clients" showFAB={false}>
       <div className="space-y-6">
-        <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 pt-1 pb-2">
+        {/* Sticky search and filters container */}
+        <div className="sticky top-[57px] z-10 bg-white dark:bg-gray-900 pt-1 pb-2">
           <div className="relative mb-2">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <Input
@@ -182,25 +211,41 @@ const ClientsPage = () => {
             )}
           </div>
           
-          {/* Filter chips */}
-          <div className="flex gap-2 overflow-x-auto py-2 -mx-1 px-1 no-scrollbar">
-            {filterOptions.map((status) => (
-              <Badge
-                key={status}
-                variant={activeFilter === status ? "default" : "outline"}
-                className={`cursor-pointer ${status === 'all' ? '' : ''}`}
-                onClick={() => setActiveFilter(status)}
-              >
-                {status === 'all' ? 'Tous' : status}
-              </Badge>
-            ))}
+          {/* Filter chips with horizontal scroll */}
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent dark:from-gray-900 z-10" />
+            <ScrollArea orientation="horizontal" className="w-full pb-2">
+              <div className="flex gap-2 py-2 px-1">
+                {filterOptions.map((status) => (
+                  <Badge
+                    key={status}
+                    variant={activeFilter === status ? "default" : "outline"}
+                    className="cursor-pointer py-0 h-8 px-3 whitespace-nowrap flex items-center gap-1.5"
+                    onClick={() => setActiveFilter(status)}
+                  >
+                    {getChipLabel(status)}
+                    {activeFilter === status && status !== 'all' && (
+                      <X 
+                        className="h-3 w-3" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          resetFilter();
+                        }}
+                      />
+                    )}
+                  </Badge>
+                ))}
+              </div>
+            </ScrollArea>
+            <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent dark:from-gray-900 z-10" />
           </div>
           
+          {/* Filters and sort row */}
           <div className="flex items-center justify-between mt-2">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-1" /> Filtres avancés
+                <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                  <Filter className="h-4 w-4" /> Filtres
                 </Button>
               </SheetTrigger>
               <SheetContent side="bottom" className="h-[70vh]">
@@ -211,7 +256,6 @@ const ClientsPage = () => {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="py-4">
-                  {/* Filter options would go here */}
                   <p className="text-sm text-gray-500">Options de filtrage à venir...</p>
                 </div>
                 <SheetFooter>
@@ -222,7 +266,7 @@ const ClientsPage = () => {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="flex items-center">
+                <Button variant="ghost" size="sm" className="flex items-center">
                   Trier par
                   {sortDirection === 'asc' ? (
                     <ArrowUp className="h-4 w-4 ml-1" />
@@ -248,7 +292,7 @@ const ClientsPage = () => {
         
         {isLoading ? (
           <div className="space-y-3 animate-pulse">
-            {[1, 2, 3].map((i) => (
+            {[1, 2].map((i) => (
               <div key={i} className="p-4 rounded-lg border">
                 <div className="flex items-center space-x-4">
                   <Skeleton className="h-10 w-10 rounded-full" />
@@ -264,7 +308,7 @@ const ClientsPage = () => {
         ) : (
           <div>
             {paginatedClients.length > 0 ? (
-              <div className="space-y-3 animate-fade-in">
+              <div className="space-y-3 animate-fade-in pb-20">
                 {paginatedClients.map((client) => (
                   <ClientCard
                     key={client.clientId}
@@ -276,26 +320,54 @@ const ClientsPage = () => {
                     lastContacted={client.lastContacted}
                     status={client.status}
                     onClick={() => navigate(`/client/${client.clientId}`)}
+                    onSwipeLeft={() => handleCall(client.clientId, client.fullName)}
+                    onSwipeRight={() => handleMessage(client.clientId, client.fullName)}
                   />
                 ))}
               </div>
             ) : (
               <div className="text-center py-10 animate-fade-in">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                <div className="mx-auto max-w-xs mb-5 opacity-70">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-40 w-40 mx-auto text-gray-300">
+                    <path
+                      d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M9 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                <h3 className="font-medium text-lg mb-2">Aucun contact pour le moment</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-4 max-w-md mx-auto">
                   {searchQuery || activeFilter !== 'all' 
                     ? "Aucun client ne correspond à votre recherche" 
-                    : "Aucun client disponible"}
+                    : "Commencez par ajouter votre premier contact pour gérer votre relation client efficacement."}
                 </p>
                 <Button onClick={() => navigate('/add-client')}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Ajouter un client
+                  Ajouter votre premier contact
                 </Button>
               </div>
             )}
             
             {/* Pagination component */}
             {sortedClients.length > itemsPerPage && (
-              <Pagination className="mt-6">
+              <Pagination className="mt-6 pb-20">
                 <PaginationContent>
                   <PaginationItem>
                     <PaginationPrevious 
@@ -327,6 +399,30 @@ const ClientsPage = () => {
           </div>
         )}
       </div>
+      
+      {/* Custom FAB with counter */}
+      {clientCount > 0 && (
+        <div className="fixed bottom-[96px] right-6 z-40">
+          {clientCount > freeQuota * 0.8 && (
+            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1 font-medium">
+              {clientCount}/{freeQuota}
+            </div>
+          )}
+          <Button 
+            size="icon"
+            aria-label="Nouveau client"
+            className="w-14 h-14 rounded-full shadow-md bg-[#2166F0] text-white hover:bg-blue-600 transition-colors"
+            onClick={() => navigate('/add-client')}
+          >
+            <Plus size={24} />
+          </Button>
+          {clientCount > freeQuota * 0.8 && (
+            <div className="absolute top-16 right-0 bg-white dark:bg-gray-800 shadow-md rounded-md px-3 py-2 text-xs whitespace-nowrap">
+              Passez Pro pour illimité
+            </div>
+          )}
+        </div>
+      )}
     </Layout>
   );
 };
