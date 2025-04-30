@@ -28,7 +28,7 @@ const mockActivities: Activity[] = [
   {
     id: '3',
     title: 'Appel de suivi Sophie Martin',
-    excerpt: 'Intérêt pour l'offre premium. Relancer dans 2 semaines.',
+    excerpt: "Intérêt pour l'offre premium. Relancer dans 2 semaines.",
     tags: [{ name: 'lead', color: 'purple' }],
     status: 'new'
   },
