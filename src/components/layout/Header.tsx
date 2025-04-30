@@ -8,9 +8,10 @@ interface HeaderProps {
   title: string;
   showBackButton?: boolean;
   onBackClick?: () => void;
+  className?: string;
 }
 
-const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => {
+const Header = ({ title, showBackButton = false, onBackClick, className }: HeaderProps) => {
   const navigate = useNavigate();
   
   const handleSearchClick = () => {
@@ -18,7 +19,7 @@ const Header = ({ title, showBackButton = false, onBackClick }: HeaderProps) => 
   };
   
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-[#111827]/80 border-b border-gray-200 dark:border-gray-800 px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.04)] backdrop-blur-md">
+    <header className={`sticky top-0 z-50 w-full bg-white/80 dark:bg-[#111827]/80 border-b border-gray-200 dark:border-gray-800 px-4 py-3 shadow-[0_4px_12px_rgba(0,0,0,0.04)] backdrop-blur-md ${className ?? ''}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           {showBackButton && (
