@@ -5,7 +5,8 @@ import {
   DashboardData,
   CallsThisMonth,
   EmailsToSend,
-  CallsToFollow
+  CallsToFollow,
+  UsageData
 } from '@/types/dashboardTypes';
 import { 
   fetchCallsData,
@@ -17,6 +18,7 @@ export const useDashboardData = (userId: string | undefined): DashboardData => {
   const [callsThisMonth, setCallsThisMonth] = useState<CallsThisMonth | null>(null);
   const [emailsToSend, setEmailsToSend] = useState<EmailsToSend | null>(null);
   const [callsToFollow, setCallsToFollow] = useState<CallsToFollow | null>(null);
+  const [usageData, setUsageData] = useState<UsageData | null>({ minutesUsed: 0, totalMinutes: 120 });
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [isLoadingCalls, setIsLoadingCalls] = useState(true);
   const [isLoadingEmails, setIsLoadingEmails] = useState(true);
@@ -52,6 +54,13 @@ export const useDashboardData = (userId: string | undefined): DashboardData => {
     try {
       const data = await fetchCallsData(userId);
       setCallsThisMonth(data);
+      
+      // Mock usage data calculation based on calls
+      // In a real app, this would come from the API
+      setUsageData({
+        minutesUsed: data.total_calls * 5, // Assume 5 minutes per call
+        totalMinutes: 120 // Default limit for free plan
+      });
     } catch (error) {
       console.error('Erreur lors du chargement des appels:', error);
       toast({
@@ -108,6 +117,7 @@ export const useDashboardData = (userId: string | undefined): DashboardData => {
     callsThisMonth,
     emailsToSend,
     callsToFollow,
+    usageData,
     isLoadingData,
     isLoadingCalls,
     isLoadingEmails,
@@ -118,3 +128,4 @@ export const useDashboardData = (userId: string | undefined): DashboardData => {
 
 // Export types from the central type file to maintain backward compatibility
 export type { DashboardData } from '@/types/dashboardTypes';
+

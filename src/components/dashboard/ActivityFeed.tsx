@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
-interface Activity {
+export interface Activity {
   id: string;
   title: string;
   excerpt: string;
@@ -147,3 +147,4 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 };
 
 export default ActivityFeed;
+
