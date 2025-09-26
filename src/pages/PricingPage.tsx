@@ -7,6 +7,7 @@ import { ArrowUpRight } from 'lucide-react';
 import HeaderMinimal from '@/components/pricing/HeaderMinimal';
 import PricingCardList from '@/components/pricing/PricingCardList';
 import FooterMinimal from '@/components/pricing/FooterMinimal';
+import { supabase } from '@/integrations/supabase/client';
 
 const plans = [
   {
@@ -50,13 +51,18 @@ const plans = [
 
 const startCheckout = async (plan: typeof plans[0]) => {
   try {
-    // In a real implementation, this would call a serverless function
-    console.log(`Starting checkout for plan: ${plan.name}`);
-    // Placeholder for the actual checkout logic
-    // const response = await supabase.functions.invoke('startCheckout', { body: { planId: plan.id } });
-    // window.location.href = response.data.url;
+    const { data, error } = await supabase.functions.invoke('start-checkout', { 
+      body: { planId: plan.id } 
+    });
+    
+    if (error) throw error;
+    
+    if (data?.url) {
+      window.location.href = data.url;
+    }
   } catch (error) {
     console.error("Error starting checkout:", error);
+    // You might want to show a toast notification here
   }
 };
 
