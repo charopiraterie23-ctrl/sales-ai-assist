@@ -7,40 +7,51 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "13.0.5"
+  }
   public: {
     Tables: {
       calls: {
         Row: {
-          audio_file: string
           client_id: string | null
           created_at: string
           duration: number
           id: string
-          language: string
-          source: Database["public"]["Enums"]["call_source"] | null
-          transcription: string | null
+          next_steps: string[] | null
+          notes: string | null
+          recording_url: string | null
+          status: string
+          summary: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          audio_file: string
           client_id?: string | null
           created_at?: string
           duration: number
           id?: string
-          language?: string
-          source?: Database["public"]["Enums"]["call_source"] | null
-          transcription?: string | null
+          next_steps?: string[] | null
+          notes?: string | null
+          recording_url?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          audio_file?: string
           client_id?: string | null
           created_at?: string
           duration?: number
           id?: string
-          language?: string
-          source?: Database["public"]["Enums"]["call_source"] | null
-          transcription?: string | null
+          next_steps?: string[] | null
+          notes?: string | null
+          recording_url?: string | null
+          status?: string
+          summary?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -51,13 +62,6 @@ export type Database = {
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "calls_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       clients: {
@@ -65,193 +69,193 @@ export type Database = {
           company: string | null
           created_at: string
           email: string | null
-          full_name: string
           id: string
-          last_contacted: string | null
+          last_contact: string | null
+          name: string
           notes: string | null
           phone: string | null
-          status: Database["public"]["Enums"]["client_status"] | null
+          status: string
           updated_at: string
           user_id: string
+          value: number | null
         }
         Insert: {
           company?: string | null
           created_at?: string
           email?: string | null
-          full_name: string
           id?: string
-          last_contacted?: string | null
+          last_contact?: string | null
+          name: string
           notes?: string | null
           phone?: string | null
-          status?: Database["public"]["Enums"]["client_status"] | null
+          status?: string
           updated_at?: string
           user_id: string
+          value?: number | null
         }
         Update: {
           company?: string | null
           created_at?: string
           email?: string | null
-          full_name?: string
           id?: string
-          last_contacted?: string | null
+          last_contact?: string | null
+          name?: string
           notes?: string | null
           phone?: string | null
-          status?: Database["public"]["Enums"]["client_status"] | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          value?: number | null
+        }
+        Relationships: []
+      }
+      follow_ups: {
+        Row: {
+          call_id: string | null
+          client_id: string | null
+          content: string
+          created_at: string
+          id: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          subject: string | null
+          template_name: string | null
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          call_id?: string | null
+          client_id?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          template_name?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          call_id?: string | null
+          client_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          subject?: string | null
+          template_name?: string | null
+          type?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "clients_user_id_fkey"
-            columns: ["user_id"]
+            foreignKeyName: "follow_ups_call_id_fkey"
+            columns: ["call_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "calls"
             referencedColumns: ["id"]
           },
-        ]
-      }
-      followup_emails: {
-        Row: {
-          body: string
-          id: string
-          is_customized: boolean | null
-          send_date: string | null
-          status: Database["public"]["Enums"]["email_status"] | null
-          subject: string
-          summary_id: string
-          to_email: string
-          updated_at: string
-        }
-        Insert: {
-          body: string
-          id?: string
-          is_customized?: boolean | null
-          send_date?: string | null
-          status?: Database["public"]["Enums"]["email_status"] | null
-          subject: string
-          summary_id: string
-          to_email: string
-          updated_at?: string
-        }
-        Update: {
-          body?: string
-          id?: string
-          is_customized?: boolean | null
-          send_date?: string | null
-          status?: Database["public"]["Enums"]["email_status"] | null
-          subject?: string
-          summary_id?: string
-          to_email?: string
-          updated_at?: string
-        }
-        Relationships: [
           {
-            foreignKeyName: "followup_emails_summary_id_fkey"
-            columns: ["summary_id"]
+            foreignKeyName: "follow_ups_client_id_fkey"
+            columns: ["client_id"]
             isOneToOne: false
-            referencedRelation: "summaries"
+            referencedRelation: "clients"
             referencedColumns: ["id"]
           },
         ]
       }
       profiles: {
         Row: {
-          avatar_url: string | null
+          company: string | null
           created_at: string
-          dark_mode: boolean
-          email_synced: boolean
-          full_name: string
+          display_name: string | null
+          email: string | null
           id: string
-          lang: string
-          phone_number: string | null
-          plan: string
+          preferences: Json | null
+          role: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          avatar_url?: string | null
+          company?: string | null
           created_at?: string
-          dark_mode?: boolean
-          email_synced?: boolean
-          full_name: string
-          id: string
-          lang?: string
-          phone_number?: string | null
-          plan?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          preferences?: Json | null
+          role?: string | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          avatar_url?: string | null
+          company?: string | null
           created_at?: string
-          dark_mode?: boolean
-          email_synced?: boolean
-          full_name?: string
+          display_name?: string | null
+          email?: string | null
           id?: string
-          lang?: string
-          phone_number?: string | null
-          plan?: string
+          preferences?: Json | null
+          role?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
-      summaries: {
+      templates: {
         Row: {
-          call_id: string
-          generated_at: string
+          content: string
+          created_at: string
           id: string
-          is_edited: boolean | null
-          summary_text: string
-          tags: string[] | null
-          tone: Database["public"]["Enums"]["summary_tone"] | null
+          is_default: boolean | null
+          name: string
+          subject: string | null
+          type: string
+          updated_at: string
+          user_id: string
+          variables: Json | null
         }
         Insert: {
-          call_id: string
-          generated_at?: string
+          content: string
+          created_at?: string
           id?: string
-          is_edited?: boolean | null
-          summary_text: string
-          tags?: string[] | null
-          tone?: Database["public"]["Enums"]["summary_tone"] | null
+          is_default?: boolean | null
+          name: string
+          subject?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+          variables?: Json | null
         }
         Update: {
-          call_id?: string
-          generated_at?: string
+          content?: string
+          created_at?: string
           id?: string
-          is_edited?: boolean | null
-          summary_text?: string
-          tags?: string[] | null
-          tone?: Database["public"]["Enums"]["summary_tone"] | null
+          is_default?: boolean | null
+          name?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          variables?: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "summaries_call_id_fkey"
-            columns: ["call_id"]
-            isOneToOne: false
-            referencedRelation: "calls"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_audio_url: {
-        Args: { file_path: string }
-        Returns: string
-      }
-      get_user_stats: {
-        Args: { user_uuid: string }
-        Returns: {
-          total_calls: number
-          total_clients: number
-          total_followups: number
-          recent_activity: Json
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
-      call_source: "upload" | "enregistrement"
-      client_status: "lead" | "intéressé" | "en attente" | "conclu" | "perdu"
-      email_status: "à envoyer" | "envoyé" | "échoué"
-      summary_tone: "formel" | "neutre" | "amical"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -259,21 +263,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -291,14 +299,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -314,14 +324,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -337,14 +349,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -352,25 +366,22 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {
   public: {
-    Enums: {
-      call_source: ["upload", "enregistrement"],
-      client_status: ["lead", "intéressé", "en attente", "conclu", "perdu"],
-      email_status: ["à envoyer", "envoyé", "échoué"],
-      summary_tone: ["formel", "neutre", "amical"],
-    },
+    Enums: {},
   },
 } as const
