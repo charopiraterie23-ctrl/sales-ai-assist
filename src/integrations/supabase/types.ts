@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_summaries: {
+        Row: {
+          call_id: string | null
+          client_id: string | null
+          confidence_score: number | null
+          content: string
+          created_at: string
+          id: string
+          key_points: Json | null
+          next_steps: Json | null
+          tags: string[] | null
+          tone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          call_id?: string | null
+          client_id?: string | null
+          confidence_score?: number | null
+          content: string
+          created_at?: string
+          id?: string
+          key_points?: Json | null
+          next_steps?: Json | null
+          tags?: string[] | null
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          call_id?: string | null
+          client_id?: string | null
+          confidence_score?: number | null
+          content?: string
+          created_at?: string
+          id?: string
+          key_points?: Json | null
+          next_steps?: Json | null
+          tags?: string[] | null
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       calls: {
         Row: {
           client_id: string | null
@@ -172,6 +217,36 @@ export type Database = {
           },
         ]
       }
+      payment_logs: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          status: string
+          stripe_customer_id: string
+          stripe_invoice_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          status: string
+          stripe_customer_id: string
+          stripe_invoice_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_invoice_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           company: string | null
@@ -179,8 +254,12 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          plan: string | null
           preferences: Json | null
           role: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          subscription_status: string | null
           updated_at: string
           user_id: string
         }
@@ -190,8 +269,12 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          plan?: string | null
           preferences?: Json | null
           role?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
           updated_at?: string
           user_id: string
         }
@@ -201,8 +284,48 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          plan?: string | null
           preferences?: Json | null
           role?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          subscription_status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sms_logs: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          message: string
+          phone_number: string
+          status: string
+          twilio_sid: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          phone_number: string
+          status?: string
+          twilio_sid?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          phone_number?: string
+          status?: string
+          twilio_sid?: string | null
           updated_at?: string
           user_id?: string
         }
